@@ -31,10 +31,10 @@ export REPO__URL__CONFIGURATION=git://github.com/barakber/configuration.git
 export REPO__BRANCH__CONFIGURATION=master
 
 export REPO__URL__KERNEL=git://github.com/ariknem/linux.git
-export REPO__BRANCH__KERNEL=omap_dt_rebased
+export REPO__BRANCH__KERNEL=dt-3.8.y
 
 export REPO__URL__DRIVER=git://github.com/TI-OpenLink/wl18xx.git
-export REPO__BRANCH__DRIVER=mc_internal_39
+export REPO__BRANCH__DRIVER=mc_internal_310
 
 export REPO__URL__HOSTAP=git://github.com/ariknem/hostap.git
 export REPO__BRANCH__HOSTAP=arm_android_jb_mr1_39
@@ -46,10 +46,10 @@ export REPO__URL__LIBNL=git://github.com/ariknem/libnl.git
 export REPO__BRANCH__LIBNL=libnl3_arm
 
 export REPO__URL__COMPAT=git://github.com/TI-OpenLink/compat.git
-export REPO__BRANCH__COMPAT=dt
+export REPO__BRANCH__COMPAT=dt_310
 
 export REPO__URL__COMPAT_WIRELESS=git://github.com/TI-OpenLink/compat-wireless.git
-export REPO__BRANCH__COMPAT_WIRELESS=dt
+export REPO__BRANCH__COMPAT_WIRELESS=dt_310
 
 export REPO__URL__CRDA=git://github.com/mcgrof/crda.git
 export REPO__BRANCH__CRDA=v1.1.3

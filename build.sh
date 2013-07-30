@@ -77,7 +77,8 @@ function configure_kernel()
     cd ${PATH__SRC__KERNEL}
     [ -z $NO_CONFIG ] && rm .config
     [ -z $NO_CONFIG ] && rm .config.old
-    [ -z $NO_CONFIG ] && cp ${PATH__SRC__CONFIGURATION}/kernel.config .config
+  # [ -z $NO_CONFIG ] && cp ${PATH__SRC__CONFIGURATION}/kernel.config .config
+   [ -z $NO_CONFIG ] && cp ../../kernel.config .config
     [ -z $NO_CONFIG ] && yes "" 2>/dev/null | make oldconfig >/dev/null
     cd -
 }
@@ -199,23 +200,23 @@ function install_outputs()
 
 function main()
 {
-#   setup_environment
-#   setup_directories
+   setup_environment
+   setup_directories
+   #setup_toolchain
 
-#   setup_toolchain
-#   setup_repositories
-#   setup_branches
-#
-#   configure_kernel
-#   build_uimage
-#   build_modules
-#   build_openssl
-#   build_libnl
-#   build_wpa_supplicant
-#   build_hostapd
-#   build_crda
-	build_ti_utils
-#	build_outputs
+   setup_repositories
+   setup_branches
+
+   configure_kernel
+   build_uimage
+   build_modules
+   build_openssl
+   build_libnl
+   build_wpa_supplicant
+   build_hostapd
+   build_crda
+   build_ti_utils
+   build_outputs
 
 #	[ ! -z INSTALL ] && install_outputs
 }
