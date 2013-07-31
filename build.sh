@@ -199,25 +199,25 @@ function install_outputs()
 
 function main()
 {
-#   setup_environment
-#   setup_directories
+   setup_environment
+   setup_directories
 
-#   setup_toolchain
-#   setup_repositories
-#   setup_branches
-#
-#   configure_kernel
-#   build_uimage
-#   build_modules
-#   build_openssl
-#   build_libnl
-#   build_wpa_supplicant
-#   build_hostapd
-#   build_crda
-	build_ti_utils
-#	build_outputs
+   setup_toolchain
+   setup_repositories
+   setup_branches
 
-#	[ ! -z INSTALL ] && install_outputs
+   configure_kernel
+   build_uimage
+   build_modules
+   build_openssl
+   build_libnl
+   build_wpa_supplicant
+   build_hostapd
+   build_crda
+   build_ti_utils
+   build_outputs
+
+   [ ! -z INSTALL ] && install_outputs
 }
 main
 
