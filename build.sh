@@ -38,8 +38,9 @@ function setup_directories()
 function setup_toolchain()
 {
 	[ ! -f ${PATH__DOWNLOADS}/arm-toolchain.tar.bz2 ] && wget https://sourcery.mentor.com/GNUToolchain/package6488/public/arm-none-linux-gnueabi/arm-2010q1-202-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2 -O ${PATH__DOWNLOADS}/arm-toolchain.tar.bz2
-    tar xjf ${PATH__DOWNLOADS}/arm-toolchain.tar.bz2 -C ${PATH__TOOLCHAIN}
-    mv ${PATH__TOOLCHAIN}/* ${PATH__TOOLCHAIN}/arm
+    [ ! -d ${PATH__TOOLCHAIN}/arm ] && tar -xjf ${PATH__DOWNLOADS}/arm-toolchain.tar.bz2 -C ${PATH__TOOLCHAIN}    
+    [ ! -d ${PATH__TOOLCHAIN}/arm ] && mv ${PATH__TOOLCHAIN}/* ${PATH__TOOLCHAIN}/arm
+    
 }
 
 function setup_repositories()
@@ -55,6 +56,8 @@ function setup_repositories()
     [ -z $NO_CLONE ] && git clone ${REPO__URL__OPENSSL} ${PATH__SRC__OPENSSL}
     [ -z $NO_CLONE ] && git clone ${REPO__URL__LIBNL} ${PATH__SRC__LIBNL}
 	[ -z $NO_CLONE ] && git clone ${REPO__URL__TI_UTILS} ${PATH__SRC__TI_UTILS}
+    [ -z $NO_CLONE ] && git clone ${REPO__URL__FW_DOWNLOAD} ${PATH__SRC__FW_DOWNLOAD}   
+    [ -z $NO_CLONE ] && git clone ${REPO__URL__SCRIPTS_DOWNLOAD} ${PATH__SRC__SCRIPTS_DOWNLOAD}
 }
 
 function setup_branches()
@@ -70,6 +73,8 @@ function setup_branches()
     cd ${PATH__SRC__CRDA};            git checkout ${REPO__BRANCH__CRDA};            cd -
     cd ${PATH__SRC__WIRELESS_REGDB};  git checkout ${REPO__BRANCH__WIRELESS_REGDB};  cd -
 	cd ${PATH__SRC__TI_UTILS};        git checkout ${REPO__BRANCH__TI_UTILS};        cd -
+    cd ${PATH__SRC__FW_DOWNLOAD};     git checkout ${REPO__BRANCH__FW_DOWNLOAD};     cd -
+    cd ${PATH__SRC__SCRIPTS_DOWNLOAD};git checkout ${REPO__BRANCH__SCRIPTS_DOWNLOAD};cd -
 }
 
 function configure_kernel()
@@ -78,7 +83,6 @@ function configure_kernel()
     [ -z $NO_CONFIG ] && rm .config
     [ -z $NO_CONFIG ] && rm .config.old
    [ -z $NO_CONFIG ] && cp ${PATH__SRC__CONFIGURATION}/kernel.config .config
-   [ -z $NO_CONFIG ] && cp ../../kernel.config .config
     [ -z $NO_CONFIG ] && yes "" 2>/dev/null | make oldconfig >/dev/null
     cd -
 }
@@ -175,6 +179,28 @@ function build_ti_utils()
 	cd -	
 }
 
+function build_fw_download()
+{
+    cd ${PATH__SRC__FW_DOWNLOAD}
+    mkdir -p $PATH__FILESYSTEM/lib/firmware/ti-connectivity
+    cp ${PATH__SRC__FW_DOWNLOAD}/wl18xx-fw-mc.bin ${PATH__FILESYSTEM}/lib/firmware/ti-connectivity
+    cd -
+}
+
+
+function build_scripts_download()
+{
+    cd ${PATH__SRC__SCRIPTS_DOWNLOAD}   
+	echo "Copying scripts"
+	for script_dir in `ls ${PATH__SRC__SCRIPTS_DOWNLOAD}`
+	do
+		echo "Copying everything from ${script_dir} to /home/root directory"
+		mkdir -p ${PATH__FILESYSTEM}/usr/share/wl18xx
+		cp -rf ${PATH__SRC__SCRIPTS_DOWNLOAD}/${script_dir}/* ${PATH__FILESYSTEM}/usr/share/wl18xx
+	done       
+    cd -
+}
+
 function build_outputs()
 {
 	rm -f ${PATH__OUTPUTS__TAR_FILESYSTEM}
@@ -215,8 +241,9 @@ function main()
    build_hostapd
    build_crda
    build_ti_utils
+   build_fw_download
+   build_scripts_download
    build_outputs
-
    [ ! -z INSTALL ] && install_outputs
 }
 main

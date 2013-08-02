@@ -24,6 +24,8 @@ export PATH__SRC__COMPAT_WIRELESS=${PATH__SRC}/compat-wireless
 export PATH__SRC__CRDA=${PATH__SRC}/crda
 export PATH__SRC__WIRELESS_REGDB=${PATH__SRC}/wireless-regdb
 export PATH__SRC__TI_UTILS=${PATH__SRC}/ti-utils
+export PATH__SRC__FW_DOWNLOAD=${PATH__SRC}/fw-download
+export PATH__SRC__SCRIPTS_DOWNLOAD=${PATH__SRC}/scripts-download
 
 #---------------------------------------
 # Git repositories
@@ -52,11 +54,18 @@ export REPO__URL__COMPAT_WIRELESS=git://github.com/TI-OpenLink/compat-wireless.g
 export REPO__BRANCH__COMPAT_WIRELESS=dt_310
 
 export REPO__URL__CRDA=git://github.com/mcgrof/crda.git
-export REPO__BRANCH__CRDA=v1.1.3
+export REPO__BRANCH__CRDA=v1.1.3 
 
 export REPO__URL__WIRELESS_REGDB=git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
 export REPO__BRANCH__WIRELESS_REGDB=master
 
 export REPO__URL__TI_UTILS=git://github.com/TI-OpenLink/ti-utils
 export REPO__BRANCH__TI_UTILS=master
+
+export REPO__URL__FW_DOWNLOAD=git://github.com/TI-OpenLink/wl18xx_fw.git
+export REPO__BRANCH__FW_DOWNLOAD=master
+
+export REPO__URL__SCRIPTS_DOWNLOAD=git://github.com/TI-OpenLink/wl12xx_target_scripts.git
+export REPO__BRANCH__SCRIPTS_DOWNLOAD=sitara_310
+
 
