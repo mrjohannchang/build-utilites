@@ -1,6 +1,17 @@
 export PATH__ROOT=`pwd`
 . configuration.sh
 
+
+# Pretty colors
+GREEN="\033[01;32m"
+YELLOW="\033[01;33m"
+NORMAL="\033[00m"
+BLUE="\033[34m"
+RED="\033[31m"
+PURPLE="\033[35m"
+CYAN="\033[36m"
+UNDERLINE="\033[02m"
+
 function assert_no_error()
 {
 	if [ $? -ne 0 ]; then
@@ -85,6 +96,7 @@ function setup_filesystem_skeleton()
 	mkdir -p `path filesystem`/usr/share/wl18xx
 	mkdir -p `path filesystem`/usr/sbin/wlconf
 	mkdir -p `path filesystem`/usr/sbin/wlconf/official_inis
+    mkdir -p `path filesystem`/etc/wireless-regdb/pubkeys
 }
 
 function setup_directories()
@@ -104,6 +116,7 @@ function setup_repositories()
 	while [ $i -lt ${#repositories[@]} ]; do
 		url=${repositories[$i + 1]}
 		name=${repositories[$i]}
+        echo -e "${NORMAL}Cloning into: ${GREEN} $name "       
 		[ ! -d `repo_path $name` ] && git clone $url `repo_path $name`
 		i=$[$i + 3]
 	done
@@ -116,6 +129,7 @@ function setup_branches()
 		name=${repositories[$i]}
 		branch=${repositories[$i + 2]}
 		cd_repo $name
+        echo -e "${NORMAL}Checking out branch ${GREEN}$branch  ${NORMAL}in repo ${GREEN}$name ${NORMAL} "               
 		git checkout $branch
 		cd_back
 		i=$[$i + 3]
@@ -166,10 +180,11 @@ function build_modules()
 	fi
 	[ -z $NO_CONFIG ] && ./scripts/admin-refresh.sh network
 	[ -z $NO_CONFIG ] && ./scripts/driver-select wl18xx
-	make -j${PROCESSORS_NUMBER}
+	make -j${PROCESSORS_NUMBER} 
 	assert_no_error
 	find . -name \*.ko -exec cp {} `path debugging`/ \;
 	find . -name \*.ko -exec ${CROSS_COMPILE}strip -g {} \;
+    
 	make -C ${KERNEL_PATH} M=`pwd` "INSTALL_MOD_PATH=`path filesystem`" modules_install
 	assert_no_error
 	#chmod -R 0777 ${PATH__FILESYSTEM}/lib/modules/
@@ -230,11 +245,11 @@ function build_hostapd()
 }
 
 function build_crda()
-{
-	export REG_BIN=`path filesystem`/usr/lib/crda/regulatory.bin
-	cp `repo_path wireless_regdb`/regulatory.bin ${REG_BIN}
-
-	cd_repo crda
+{	
+	cp `repo_path wireless_regdb`/regulatory.bin `path filesystem`/usr/lib/crda/regulatory.bin
+	cp `repo_path wireless_regdb`/linville.key.pub.pem `path filesystem`/etc/wireless-regdb/pubkeys/
+    cd_repo crda
+	
 	[ -z $NO_CLEAN ] && DESTDIR=`path filesystem` make clean
 	[ -z $NO_CLEAN ] && assert_no_error
 	DESTDIR=`path filesystem` NLLIBS="-lnl -lnl-genl" NLLIBNAME=libnl-3.0 CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`path filesystem`/include -L`path filesystem`/usr/local/ssl/lib -L`path filesystem`/lib" LDLIBS+=-lm USE_OPENSSL=1 UDEV_RULE_DIR="etc/udev/rules.d/" make -j${PROCESSORS_NUMBER} all_noverify CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
@@ -419,41 +434,58 @@ function build_all()
 	build_fw_download
 	build_scripts_download
 }
-
+function print_highlight()
+{      
+    echo -e "   ${YELLOW}***** $1 ***** ${NORMAL} "
+}
 function main()
 {
 	setup_environment
+    
 	case "$1" in
-		'rebuild')
+		'rebuild')        
+        print_highlight " cleaning & building all "       
 		build_all
 		;;
 
 		'build')
+        print_highlight " building all (w/o clean) "       
 		NO_CLEAN=1 NO_CONFIG=1 build_all
 		;;
 
 		'build_kernel')
-		configure_kernel
+		print_highlight " building only Kernel "
+        configure_kernel
 		build_uimage
 		;;
 
 		'build_modules')
-		NO_CLEAN=1 NO_CONFIG=1 build_modules
+        print_highlight " building only Driver modules "
+		build_modules
+        #NO_CLEAN=1 NO_CONFIG=1 build_modules
 		;;
 
 		'build_wpa_supplicant')
-		NO_CLEAN=1 NO_CONFIG=1 build_wpa_supplicant
+        print_highlight " building only wpa_supplicant "
+		build_wpa_supplicant
+        #NO_CLEAN=1 NO_CONFIG=1 build_wpa_supplicant
+        
 		;;
 
 		'build_hostapd')
-		NO_CLEAN=1 NO_CONFIG=1 build_hostapd
+        print_highlight " building only hostapd "
+		build_hostapd
+        #NO_CLEAN=1 NO_CONFIG=1 build_hostapd
 		;;
 
 		'build_crda')
-		NO_CLEAN=1 NO_CONFIG=1 build_crda
+        print_highlight " building only CRDA "
+		build_crda
+        #NO_CLEAN=1 NO_CONFIG=1 build_crda        
 		;;
 
 		*)
+        print_highlight  " cleaning & building all "
 		build_all
 		;;
 	esac

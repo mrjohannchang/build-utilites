@@ -101,6 +101,6 @@ master
 
 scripts_download
 https://github.com/TI-OpenLink/wl12xx_target_scripts.git
-sitara_310
+sitara
 
 )
