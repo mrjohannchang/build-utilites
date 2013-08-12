@@ -191,20 +191,10 @@ function setup_toolchain()
 	fi
 }
 
-function configure_kernel()
-{
-cd_repo kernel
-	rm .config
-	rm .config.old
-	cp `path configuration`/kernel.config .config
-	yes "" 2>/dev/null | make oldconfig >/dev/null
-	assert_no_error
-	cd_back
-}
-
 function build_uimage()
 {
 	cd_repo kernel
+	[ -z $NO_CONFIG ] && cp `path configuration`/kernel.config `repo_path kernel`/.config
 	[ -z $NO_CLEAN ] && make clean
 	[ -z $NO_CLEAN ] && assert_no_error
 	make -j${PROCESSORS_NUMBER} uImage
@@ -506,12 +496,11 @@ function build_all()
     [ -z $NO_VERIFY ] && verify_skeleton
     
 }
+
 function setup_and_build()
 {
-    setup_workspace    
-    
-	[ -z $NO_CONFIG ] && configure_kernel
-    build_all    
+    setup_workspace
+    build_all
 }
 
 function main()
@@ -564,7 +553,6 @@ function main()
         #################### Building single components #############################
 		'kernel')
 		print_highlight " building only Kernel "
-        configure_kernel
 		build_uimage
 		;;
 
