@@ -12,12 +12,47 @@ PURPLE="\033[35m"
 CYAN="\033[36m"
 UNDERLINE="\033[02m"
 
+function print_highlight()
+{      
+    echo -e "   ${YELLOW}***** $1 ***** ${NORMAL} "
+}
+
+function usage ()
+{
+	echo ""
+    echo "This script compiles one/all of the following utilities: kernel, libnl, openssl, hostapd, wpa_supplicant,wl18xx_modules,firmware,crda,calibrator"
+	echo "by calling specific utility name and action."
+    echo ""
+	echo " Usage: ./build.sh download     <head|TAG>  [ Update w/o build        ] "
+	echo "                   update       <head|TAG>  [ Update & build          ] "
+	echo "                   rebuild                  [ Build w/o update        ] "
+    echo "                   clean                    [ Clean, Update & build   ] "
+    echo "                              "
+    echo " Building a specific module usage "
+    echo "       ./build.sh    hostapd "
+    echo "                     wpa_supplicant "
+    echo "                     modules(driver) "
+    echo "                     firmware "
+    echo "                     scripts "
+    echo "                     calibrator "
+    echo "                     wlconf "
+    echo "                     calibrator "
+    echo "                      "
+    echo "                     uimage "
+    echo "                     openssl "
+    echo "                     libnl "
+    echo "                     crda "    
+
+	exit 1
+}
+
 function assert_no_error()
 {
 	if [ $? -ne 0 ]; then
-		echo "****** ERROR *******"
+		echo "****** ERROR $? $@*******"
 		exit 1
 	fi
+    echo "****** $1 *******"
 }
 
 function repo_id()
@@ -124,13 +159,23 @@ function setup_repositories()
 
 function setup_branches()
 {
-	i="0"
+	i="0"    
 	while [ $i -lt ${#repositories[@]} ]; do
 		name=${repositories[$i]}
-		branch=${repositories[$i + 2]}
-		cd_repo $name
-        echo -e "${NORMAL}Checking out branch ${GREEN}$branch  ${NORMAL}in repo ${GREEN}$name ${NORMAL} "               
-		git checkout $branch
+		url=${repositories[$i + 1]}
+        branch=${repositories[$i + 2]}   
+        checkout_type="branch"       
+        #for all the openlink repo. we use a tag if provided.
+        cd_repo $name    
+        echo -e "${NORMAL}Checking out branch ${GREEN}$branch  ${NORMAL}in repo ${GREEN}$name ${NORMAL} "
+		git checkout $branch        
+        git fetch origin
+        git fetch origin --tags  
+        [[ -n $RESET ]] && git reset --hard $branch   && echo -e "${NORMAL}Reset to latest in repo ${GREEN}$name ${NORMAL} "   
+        if [[ "$url" == *TI-OpenLink* ]]
+        then            
+           [[ -n $USE_TAG ]] && git reset --hard $USE_TAG  && echo -e "${NORMAL}Reset to tag ${GREEN}$USE_TAG   ${NORMAL}in repo ${GREEN}$name ${NORMAL} "            
+        fi        
 		cd_back
 		i=$[$i + 3]
 	done
@@ -139,6 +184,7 @@ function setup_branches()
 function setup_toolchain()
 {
 	if [ ! -f `path downloads`/arm-toolchain.tar.bz2 ]; then
+        echo "Setting toolchain"
 		wget ${toolchain[0]} -O `path downloads`/arm-toolchain.tar.bz2
 		tar -xjf `path downloads`/arm-toolchain.tar.bz2 -C `path toolchain`
 		mv `path toolchain`/* `path toolchain`/arm
@@ -147,10 +193,10 @@ function setup_toolchain()
 
 function configure_kernel()
 {
-	cd_repo kernel
+cd_repo kernel
 	rm .config
 	rm .config.old
-	cp `repo_path configuration`/kernel.config .config
+	cp `path configuration`/kernel.config .config
 	yes "" 2>/dev/null | make oldconfig >/dev/null
 	assert_no_error
 	cd_back
@@ -173,7 +219,7 @@ function build_modules()
 {
 	cd_repo compat_wireless
 	if [ -z $NO_CLEAN ]; then
-		git reset --hard HEAD
+		#git reset --hard HEAD
 		make clean
 		#assert_no_error
 		rm .compat* MAINTAINERS Makefile.bk .compat_autoconf_
@@ -228,12 +274,15 @@ function build_wpa_supplicant()
 	assert_no_error
 	DESTDIR=`path filesystem` make install
 	assert_no_error
-	cd_back
+	cd_back    
+    cp `path configuration`/wpa_supplicant.conf `path filesystem`/etc/wpa_supplicant.conf   
+    cp `path configuration`/p2p_supplicant.conf `path filesystem`/etc/p2p_supplicant.conf   
+	
 }
 
 function build_hostapd()
-{
-	cd `repo_path hostap`/hostapd
+{	       
+    cd `repo_path hostap`/hostapd
 	[ -z $NO_CONFIG ] && cp android.config .config
 	DESTDIR=`path filesystem` make clean
 	assert_no_error
@@ -242,6 +291,7 @@ function build_hostapd()
 	DESTDIR=`path filesystem` make install
 	assert_no_error
 	cd_back
+    cp `path configuration`/hostapd.conf `path filesystem`/etc/hostapd.conf   	
 }
 
 function build_crda()
@@ -309,16 +359,24 @@ function build_scripts_download()
 	scripts_download_path=`repo_path scripts_download`
 	for script_dir in `ls $scripts_download_path`
 	do
-		echo "Copying everything from ${script_dir} to /usr/share/wl18xx directory"
+		echo "Copying everything from ${script_dir} to `path filesystem`/usr/share/wl18xx directory"
 		cp -rf `repo_path scripts_download`/${script_dir}/* `path filesystem`/usr/share/wl18xx
 	done
 	cd_back
 }
 
+function clean_outputs()
+{
+	echo "Cleaning outputs"    
+    rm -rf `path filesystem`/*
+    rm -f `path outputs`/${tar_filesystem[0]}
+	rm -f `path outputs`/uImage
+	
+}
+
 function build_outputs()
 {
-	rm -f `path outputs`/${tar_filesystem[0]}
-	rm -f `path outputs`/uImage
+	echo "Building outputs"    
 	cd_path filesystem
 	tar cpjf `path outputs`/${tar_filesystem[0]} .
 	cd_back
@@ -327,6 +385,7 @@ function build_outputs()
 
 function install_outputs()
 {
+    echo "Installing outputs"
 	tftp_path=${setup[2]}
 	sitara_left_path=${setup[5]}
 	sitara_right_path=${setup[8]}
@@ -395,7 +454,7 @@ function verify_skeleton()
 		source_path=${files_to_verify[i + 1]}
 		file_pattern=${files_to_verify[i + 2]}
 		file $skeleton_path | grep "${file_pattern}" >/dev/null
-		assert_no_error
+		assert_no_error 
 
 		md5_skeleton=$(md5sum $skeleton_path | awk '{print $1}')
 		md5_source=$(md5sum $source_path     | awk '{print $1}')
@@ -414,83 +473,136 @@ function verify_skeleton()
 	fi
 }
 
-function build_all()
+function setup_workspace()
 {
-	setup_directories
-	setup_toolchain
+	setup_directories	
 	setup_repositories
 	setup_branches
+    setup_toolchain   
+}
 
+
+function build_all()
+{
+    if [ -z $NO_EXTERNAL ] 
+    then
+        build_uimage
+        build_openssl
+        build_libnl
+        build_crda
+    fi
+    
+    if [ -z $NO_OPENLINK ] 
+    then
+        build_modules
+        build_wpa_supplicant
+        build_hostapd	
+        build_calibrator
+        build_wlconf
+        build_fw_download
+        build_scripts_download
+    fi
+    
+    [ -z $NO_VERIFY ] && verify_skeleton
+    
+}
+function setup_and_build()
+{
+    setup_workspace    
+    
 	[ -z $NO_CONFIG ] && configure_kernel
-	build_uimage
-	build_modules
-	build_openssl
-	build_libnl
-	build_wpa_supplicant
-	build_hostapd
-	build_crda
-	build_calibrator
-	build_wlconf
-	build_fw_download
-	build_scripts_download
+    build_all    
 }
-function print_highlight()
-{      
-    echo -e "   ${YELLOW}***** $1 ***** ${NORMAL} "
-}
+
 function main()
 {
-	setup_environment
+	[[ "$1" == "-h" || "$1" == "--help"  ]] && usage
+
+    setup_environment
+    setup_directories
+    
+     
     
 	case "$1" in
-		'rebuild')        
+		'update')                
+        print_highlight " setting up workspace and building all "       
+		if [  -n "$2" ]
+        then
+            print_highlight "Using tag $2 " 
+            USE_TAG=$2
+        else
+            print_highlight "Updating all to head (this will revert local changes)" 
+            RESET=1    
+        fi        
+        setup_workspace
+        build_all
+		;;
+        
+        'download')                
+        print_highlight " setting up workspace (w/o build) "       
+		[[  -n "$2" ]] && echo "Using tag $2 " && USE_TAG=$2                
+        NO_BUILD=1 
+        setup_workspace
+		;;
+        
+        
+        'clean')        
         print_highlight " cleaning & building all "       
-		build_all
+		#clean_outputs
+        setup_and_build
 		;;
 
-		'build')
+		'rebuild')
         print_highlight " building all (w/o clean) "       
-		NO_CLEAN=1 NO_CONFIG=1 build_all
+		NO_CLEAN=1 build_all
 		;;
-
-		'build_kernel')
+        
+		'openlink')
+        print_highlight " building all (w/o clean) "       
+		NO_EXTERNAL=1 setup_and_build
+		;;
+        #################### Building single components #############################
+		'kernel')
 		print_highlight " building only Kernel "
         configure_kernel
 		build_uimage
 		;;
 
-		'build_modules')
+		'modules')
         print_highlight " building only Driver modules "
 		build_modules
-        #NO_CLEAN=1 NO_CONFIG=1 build_modules
 		;;
 
-		'build_wpa_supplicant')
+		'wpa_supplicant')
         print_highlight " building only wpa_supplicant "
 		build_wpa_supplicant
-        #NO_CLEAN=1 NO_CONFIG=1 build_wpa_supplicant
         
 		;;
 
-		'build_hostapd')
+		'hostapd')
         print_highlight " building only hostapd "
 		build_hostapd
-        #NO_CLEAN=1 NO_CONFIG=1 build_hostapd
 		;;
 
-		'build_crda')
+		'crda')
         print_highlight " building only CRDA "
 		build_crda
-        #NO_CLEAN=1 NO_CONFIG=1 build_crda        
 		;;
-
+        
+        'scripts')
+        print_highlight " Copying scripts "
+		build_scripts_download
+		;;
+        
+        ############################################################
 		*)
-        print_highlight  " cleaning & building all "
-		build_all
+        print_highlight " building all (No clean & no source code update) "  
+		#clean_outputs
+        NO_CLEAN=1 build_all
 		;;
 	esac
-	[ -z $NO_VERIFY ] && verify_skeleton
-	build_outputs
-	[ ! -z $INSTALL_NFS ] && install_outputs
+	
+	[[ -z $NO_BUILD ]] && build_outputs
+	[[ -n $INSTALL_NFS ]] && install_outputs
 }
-main $1
+main $@

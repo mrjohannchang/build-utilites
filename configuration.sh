@@ -44,6 +44,9 @@ ${PATH__ROOT}/src
 
 debugging
 ${PATH__ROOT}/debugging
+
+configuration
+${PATH__ROOT}/configuration
 )
 
 repositories=(
@@ -51,21 +54,9 @@ repositories=(
 # url
 # branch
 
-configuration
-https://github.com/barakber/configuration.git
-master
-
 kernel
 https://github.com/ariknem/linux.git
 dt-3.8.y
-
-driver
-https://github.com/TI-OpenLink/wl18xx.git
-mc_internal_310
-
-hostap
-https://github.com/TI-OpenLink/hostap.git
-android_jb_mr1_39
 
 openssl
 https://github.com/ariknem/openssl.git
@@ -75,14 +66,6 @@ libnl
 https://github.com/ariknem/libnl.git
 libnl3_arm
 
-compat
-https://github.com/TI-OpenLink/compat.git
-dt_310
-
-compat_wireless
-https://github.com/TI-OpenLink/compat-wireless.git
-dt_310
-
 crda
 https://github.com/mcgrof/crda.git
 v1.1.3
@@ -90,6 +73,22 @@ v1.1.3
 wireless_regdb
 https://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
 master
+
+driver
+https://github.com/TI-OpenLink/wl18xx.git
+mbss
+
+hostap
+https://github.com/TI-OpenLink/hostap.git
+android_jb_mr1_39
+
+compat
+https://github.com/TI-OpenLink/compat.git
+dt_310
+
+compat_wireless
+https://github.com/TI-OpenLink/compat-wireless.git
+dt_310
 
 ti_utils
 https://github.com/TI-OpenLink/18xx-ti-utils.git
