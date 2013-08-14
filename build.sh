@@ -171,7 +171,7 @@ function setup_branches()
 		git checkout $branch        
         git fetch origin
         git fetch origin --tags  
-        [[ -n $RESET ]] && git reset --hard $branch   && echo -e "${NORMAL}Reset to latest in repo ${GREEN}$name ${NORMAL} "   
+        [[ -n $RESET ]] && echo -e "${PURPLE}Reset to latest in repo ${GREEN}$name ${NORMAL} branch  ${GREEN}$branch ${NORMAL}"  && git reset --hard $branch
         if [[ "$url" == *TI-OpenLink* ]]
         then            
            [[ -n $USE_TAG ]] && git reset --hard $USE_TAG  && echo -e "${NORMAL}Reset to tag ${GREEN}$USE_TAG   ${NORMAL}in repo ${GREEN}$name ${NORMAL} "            
