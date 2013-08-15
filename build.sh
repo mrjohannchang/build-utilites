@@ -266,9 +266,7 @@ function build_wpa_supplicant()
 	DESTDIR=`path filesystem` make install
 	assert_no_error
 	cd_back    
-    cp `path configuration`/wpa_supplicant.conf `path filesystem`/etc/wpa_supplicant.conf   
-    cp `path configuration`/p2p_supplicant.conf `path filesystem`/etc/p2p_supplicant.conf   
-	
+    cp `repo_path scripts_download`/conf/*_supplicant.conf  `path filesystem`/etc/
 }
 
 function build_hostapd()
@@ -282,7 +280,7 @@ function build_hostapd()
 	DESTDIR=`path filesystem` make install
 	assert_no_error
 	cd_back
-    cp `path configuration`/hostapd.conf `path filesystem`/etc/hostapd.conf   	
+    cp `repo_path scripts_download`/conf/hostapd.conf  `path filesystem`/etc/    
 }
 
 function build_crda()
