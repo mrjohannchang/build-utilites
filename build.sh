@@ -154,7 +154,8 @@ function setup_repositories()
         echo -e "${NORMAL}Cloning into: ${GREEN} $name "       
 		[ ! -d `repo_path $name` ] && git clone $url `repo_path $name`
 		i=$[$i + 3]
-	done
+	done        
+
 }
 
 function setup_branches()
@@ -167,13 +168,13 @@ function setup_branches()
         checkout_type="branch"       
         #for all the openlink repo. we use a tag if provided.
         cd_repo $name    
-        echo -e "${NORMAL}Checking out branch ${GREEN}$branch  ${NORMAL}in repo ${GREEN}$name ${NORMAL} "
+        echo -e "\n${NORMAL}Checking out branch ${GREEN}$branch  ${NORMAL}in repo ${GREEN}$name ${NORMAL} "
 		git checkout $branch        
         git fetch origin
         git fetch origin --tags  
-        [[ -n $RESET ]] && echo -e "${PURPLE}Reset to latest in repo ${GREEN}$name ${NORMAL} branch  ${GREEN}$branch ${NORMAL}"  && git reset --hard $branch
         if [[ "$url" == *TI-OpenLink* ]]
         then            
+           [[ -n $RESET ]] && echo -e "${PURPLE}Reset to latest in repo ${GREEN}$name ${NORMAL} branch  ${GREEN}$branch ${NORMAL}"  && git reset --hard origin/$branch
            [[ -n $USE_TAG ]] && git reset --hard $USE_TAG  && echo -e "${NORMAL}Reset to tag ${GREEN}$USE_TAG   ${NORMAL}in repo ${GREEN}$name ${NORMAL} "            
         fi        
 		cd_back
@@ -434,6 +435,37 @@ files_to_verify=(
 `repo_path ti_utils`/wlconf/wlconf
 "ELF 32-bit LSB executable, ARM"
 )
+
+
+function admin_tag()
+{
+	i="0"    
+	while [ $i -lt ${#repositories[@]} ]; do
+		name=${repositories[$i]}
+		url=${repositories[$i + 1]}
+        branch=${repositories[$i + 2]}   
+        checkout_type="branch"              
+        cd_repo $name    
+        if [[ "$url" == *TI-OpenLink* ]]
+        then                                   
+                echo -e "${PURPLE}Adding tag ${GREEN} $1 ${NORMAL} to repo : ${GREEN}$name ${NORMAL} "  ;
+                git show --summary        
+                read -p "Do you want to tag this commit ?" yn
+                case $yn in
+                    [Yy]* )  git tag -a $1 -m "$1" ;
+                             git push --tags ;;
+                    [Nn]* ) echo -e "${PURPLE}Tag was not applied ${NORMAL} " ;;
+                    
+                    * ) echo "Please answer yes or no.";;
+                esac
+           
+        fi        
+		cd_back
+		i=$[$i + 3]
+	done
+}
+
+
 function verify_skeleton()
 {
 	echo "Verifying filesystem skeleton..."
@@ -537,8 +569,9 @@ function main()
         
         'clean')        
         print_highlight " cleaning & building all "       
-		#clean_outputs
-        setup_and_build
+		clean_outputs
+        setup_directories
+        build_all        
 		;;
 
 		'rebuild')
@@ -583,7 +616,11 @@ function main()
 		;;
         
         ############################################################
-		*)
+		'admin_tag')        
+		admin_tag $2
+		;;
+        
+        *)
         print_highlight " building all (No clean & no source code update) "  
 		#clean_outputs
         NO_CLEAN=1 build_all
