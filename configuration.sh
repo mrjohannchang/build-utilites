@@ -76,7 +76,7 @@ master
 
 driver
 https://github.com/TI-OpenLink/wl18xx.git
-mbssid
+mbss
 
 hostap
 https://github.com/TI-OpenLink/hostap.git
