@@ -96,7 +96,7 @@ master
 
 fw_download
 https://github.com/TI-OpenLink/wl18xx_fw.git
-master
+mbss
 
 scripts_download
 https://github.com/TI-OpenLink/wl12xx_target_scripts.git

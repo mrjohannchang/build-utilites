@@ -413,8 +413,8 @@ files_to_verify=(
 `repo_path wireless_regdb`/regulatory.bin
 "CRDA wireless regulatory database file"
 
-`path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-mc.bin
-`repo_path fw_download`/wl18xx-fw-mc.bin
+`path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-2.bin
+`repo_path fw_download`/wl18xx-fw-2.bin
 "data"
 
 `path filesystem`/lib/modules/3.8.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
