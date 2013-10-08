@@ -76,7 +76,7 @@ master
 
 driver
 https://github.com/TI-OpenLink/wl18xx.git
-mbss
+upstream_312_mbss
 
 hostap
 https://github.com/TI-OpenLink/hostap.git
@@ -84,11 +84,11 @@ android_jb_mr1_39
 
 compat
 https://github.com/TI-OpenLink/compat.git
-dt_310
+upstream_312
 
 compat_wireless
 https://github.com/TI-OpenLink/compat-wireless.git
-dt_310
+upstream_312
 
 ti_utils
 https://github.com/TI-OpenLink/18xx-ti-utils.git
