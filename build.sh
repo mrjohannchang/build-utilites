@@ -612,7 +612,11 @@ function main()
         print_highlight " Copying scripts "
 		build_scripts_download
 		;;
-        
+        'utils')
+        print_highlight " building only ti-utils "
+        build_calibrator
+        build_wlconf		
+		;;        
         ############################################################
 		'admin_tag')        
 		admin_tag $2
