@@ -312,7 +312,7 @@ function build_calibrator()
 
 function build_wlconf()
 {
-	files_to_copy=(dictionary.txt struct.bin wl18xx-conf-default.bin README example.conf example.ini)
+	files_to_copy="dictionary.txt struct.bin wl18xx-conf-default.bin README example.conf example.ini"
 	cd `repo_path ti_utils`/wlconf
 	if [ -z $NO_CLEAN ]; then
 		NFSROOT=`path filesystem` make clean
@@ -433,6 +433,26 @@ files_to_verify=(
 `repo_path ti_utils`/wlconf/wlconf
 "ELF 32-bit LSB executable, ARM"
 )
+
+function get_tag()
+{
+       i="0"
+       while [ $i -lt ${#repositories[@]} ]; do
+               name=${repositories[$i]}
+               url=${repositories[$i + 1]}
+        branch=${repositories[$i + 2]}
+        checkout_type="branch"
+        cd_repo $name
+        if [[ "$url" == *TI-OpenLink* ]]
+        then
+                echo -e "${PURPLE}Describe of ${NORMAL} repo : ${GREEN}$name ${NORMAL} "  ;
+                git describe
+        fi
+               cd_back
+               i=$[$i + 3]
+       done
+}
+
 
 
 function admin_tag()
@@ -618,7 +638,12 @@ function main()
         build_wlconf		
 		;;        
         ############################################################
-		'admin_tag')        
+        'get_tag')
+        get_tag
+        exit
+        ;;
+		
+        'admin_tag')        
 		admin_tag $2
 		;;
         
