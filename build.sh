@@ -124,14 +124,14 @@ function setup_environment()
 
 function setup_filesystem_skeleton()
 {
-	mkdir -p `path filesystem`/home/root
+	mkdir -p `path filesystem`/usr/bin
 	mkdir -p `path filesystem`/etc
 	mkdir -p `path filesystem`/usr/lib/crda
 	mkdir -p `path filesystem`/lib/firmware/ti-connectivity
 	mkdir -p `path filesystem`/usr/share/wl18xx
 	mkdir -p `path filesystem`/usr/sbin/wlconf
 	mkdir -p `path filesystem`/usr/sbin/wlconf/official_inis
-    mkdir -p `path filesystem`/etc/wireless-regdb/pubkeys
+        mkdir -p `path filesystem`/etc/wireless-regdb/pubkeys
 }
 
 function setup_directories()
@@ -425,7 +425,7 @@ files_to_verify=(
 `repo_path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
 "ELF 32-bit LSB relocatable, ARM"
 
-`path filesystem`/home/root/calibrator
+`path filesystem`/usr/bin/calibrator
 `repo_path ti_utils`/calibrator
 "ELF 32-bit LSB executable, ARM"
 
