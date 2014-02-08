@@ -206,18 +206,22 @@ function build_uimage()
 	cd_back
 }
 
+function generate_compat()
+{
+        cd_repo backports
+        python ./gentree.py --clean `repo_path driver` `path compat_wireless`
+        cd_back
+}
+
 function build_modules()
 {
+        generate_compat
 	cd_repo compat_wireless
 	if [ -z $NO_CLEAN ]; then
-		#git reset --hard HEAD
 		make clean
-		#assert_no_error
-		rm .compat* MAINTAINERS Makefile.bk .compat_autoconf_
 	fi
-	[ -z $NO_CONFIG ] && ./scripts/admin-refresh.sh network
-	[ -z $NO_CONFIG ] && ./scripts/driver-select wl18xx
-	make -j${PROCESSORS_NUMBER} 
+	make defconfig-wl18xx
+        make -j${PROCESSORS_NUMBER} 
 	assert_no_error
 	find . -name \*.ko -exec cp {} `path debugging`/ \;
 	find . -name \*.ko -exec ${CROSS_COMPILE}strip -g {} \;
