@@ -209,19 +209,19 @@ function build_uimage()
 function generate_compat()
 {
         cd_repo backports
-        python ./gentree.py --clean `repo_path driver` `path compat_wireless`
+        python ./gentree.py --clean `repo_path driver` `path tmp_compat_wireless`
         cd_back
 }
 
 function build_modules()
 {
-        generate_compat
-	cd_repo compat_wireless
+    generate_compat
+	cd_repo tmp_compat_wireless
 	if [ -z $NO_CLEAN ]; then
 		make clean
 	fi
 	make defconfig-wl18xx
-        make -j${PROCESSORS_NUMBER} 
+    make -j${PROCESSORS_NUMBER} 
 	assert_no_error
 	find . -name \*.ko -exec cp {} `path debugging`/ \;
 	find . -name \*.ko -exec ${CROSS_COMPILE}strip -g {} \;
@@ -417,8 +417,8 @@ files_to_verify=(
 `repo_path wireless_regdb`/regulatory.bin
 "CRDA wireless regulatory database file"
 
-`path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-2.bin
-`repo_path fw_download`/wl18xx-fw-2.bin
+`path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-3.bin
+`repo_path fw_download`/wl18xx-fw-3.bin
 "data"
 
 `path filesystem`/lib/modules/3.8.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
@@ -498,7 +498,10 @@ function verify_skeleton()
 		source_path=${files_to_verify[i + 1]}
 		file_pattern=${files_to_verify[i + 2]}
 		file $skeleton_path | grep "${file_pattern}" >/dev/null
-		assert_no_error 
+        if [ $? -eq 1 ]; then
+        echo -e "${RED}ERROR " $skeleton_path " Not found ! ${NORMAL}"
+        #exit
+        fi
 
 		md5_skeleton=$(md5sum $skeleton_path | awk '{print $1}')
 		md5_source=$(md5sum $source_path     | awk '{print $1}')
@@ -533,7 +536,7 @@ function build_all()
         build_uimage
         build_openssl
         build_libnl
-        build_crda
+        #build_crda
     fi
     
     if [ -z $NO_OPENLINK ] 
