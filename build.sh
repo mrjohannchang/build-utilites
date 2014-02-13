@@ -209,14 +209,14 @@ function build_uimage()
 function generate_compat()
 {
         cd_repo backports
-        python ./gentree.py --clean `repo_path driver` `path tmp_compat_wireless`
+        python ./gentree.py --clean `repo_path driver` `path compat_wireless`
         cd_back
 }
 
 function build_modules()
 {
     generate_compat
-	cd_repo tmp_compat_wireless
+	cd_repo compat_wireless
 	if [ -z $NO_CLEAN ]; then
 		make clean
 	fi
@@ -417,16 +417,16 @@ files_to_verify=(
 `repo_path wireless_regdb`/regulatory.bin
 "CRDA wireless regulatory database file"
 
-`path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-3.bin
-`repo_path fw_download`/wl18xx-fw-3.bin
+`path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-4.bin
+`repo_path fw_download`/wl18xx-fw-4.bin
 "data"
 
 `path filesystem`/lib/modules/3.8.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
-`repo_path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
+`path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
 "ELF 32-bit LSB relocatable, ARM"
 
 `path filesystem`/lib/modules/3.8.13+/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
-`repo_path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
+`path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
 "ELF 32-bit LSB relocatable, ARM"
 
 `path filesystem`/usr/bin/calibrator
@@ -447,7 +447,7 @@ function get_tag()
         branch=${repositories[$i + 2]}
         checkout_type="branch"
         cd_repo $name
-        if [[ "$url" == *TI-OpenLink* ]]
+        if [[ "$url" == *git.ti.com* ]]
         then
                 echo -e "${PURPLE}Describe of ${NORMAL} repo : ${GREEN}$name ${NORMAL} "  ;
                 git describe
@@ -536,7 +536,7 @@ function build_all()
         build_uimage
         build_openssl
         build_libnl
-        #build_crda
+        build_crda
     fi
     
     if [ -z $NO_OPENLINK ] 

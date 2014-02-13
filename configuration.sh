@@ -50,10 +50,6 @@ ${PATH__ROOT}/debugging
 
 configuration
 ${PATH__ROOT}/configuration
-
-tmp_compat_wireless
-${PATH__ROOT}/src/tmp_compat_wireless
-
 )
 
 repositories=(
@@ -75,7 +71,7 @@ libnl3_arm
 
 crda
 https://github.com/mcgrof/crda.git
-v1.1.3
+master
 
 wireless_regdb
 https://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
@@ -102,6 +98,6 @@ git@git.ti.com:wilink8-wlan/wl18xx-target-scripts.git
 sitara-mbss
 
 backports
-https://github.com/ariknem/backports
+git@git.ti.com:wilink8-wlan/backports.git
 ap_dfs
 )
