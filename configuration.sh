@@ -66,8 +66,8 @@ https://github.com/ariknem/openssl.git
 openssl_arm
 
 libnl
-https://github.com/ariknem/libnl.git
-libnl3_arm
+https://github.com/tgraf/libnl.git
+libnl3_2_24
 
 crda
 https://github.com/mcgrof/crda.git

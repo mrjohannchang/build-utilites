@@ -263,11 +263,11 @@ function build_wpa_supplicant()
 {
 	cd `repo_path hostap`/wpa_supplicant
 	[ -z $NO_CONFIG ] && cp android.config .config
-	DESTDIR=`path filesystem` make clean
+	CONFIG_LIBNL32=y DESTDIR=`path filesystem` make clean
 	assert_no_error
-	DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`path filesystem`/include" LIBS+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl" LIBS_p+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl" make -j${PROCESSORS_NUMBER} CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
+	CONFIG_LIBNL32=y DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`repo_path libnl`/include" LIBS+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" LIBS_p+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" make -j${PROCESSORS_NUMBER} CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
 	assert_no_error
-	DESTDIR=`path filesystem` make install
+	CONFIG_LIBNL32=y DESTDIR=`path filesystem` make install
 	assert_no_error
 	cd_back    
     cp `repo_path scripts_download`/conf/*_supplicant.conf  `path filesystem`/etc/
@@ -277,11 +277,11 @@ function build_hostapd()
 {	       
     cd `repo_path hostap`/hostapd
 	[ -z $NO_CONFIG ] && cp android.config .config
-	DESTDIR=`path filesystem` make clean
+	CONFIG_LIBNL32=y DESTDIR=`path filesystem` make clean
 	assert_no_error
-	DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`path filesystem`/include" LIBS+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl" LIBS_p+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl" make -j${PROCESSORS_NUMBER} CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
+	CONFIG_LIBNL32=y DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`repo_path libnl`/include" LIBS+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" LIBS_p+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" make -j${PROCESSORS_NUMBER} CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
 	assert_no_error
-	DESTDIR=`path filesystem` make install
+	CONFIG_LIBNL32=y DESTDIR=`path filesystem` make install
 	assert_no_error
 	cd_back
     cp `repo_path scripts_download`/conf/hostapd.conf  `path filesystem`/etc/    
@@ -295,10 +295,10 @@ function build_crda()
 	
 	[ -z $NO_CLEAN ] && DESTDIR=`path filesystem` make clean
 	[ -z $NO_CLEAN ] && assert_no_error
-	DESTDIR=`path filesystem` NLLIBS="-lnl -lnl-genl" NLLIBNAME=libnl-3.0 CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`path filesystem`/include -L`path filesystem`/usr/local/ssl/lib -L`path filesystem`/lib" LDLIBS+=-lm USE_OPENSSL=1 UDEV_RULE_DIR="etc/udev/rules.d/" make -j${PROCESSORS_NUMBER} all_noverify CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
+        PKG_CONFIG_LIBDIR="`path filesystem`/lib/pkgconfig" PKG_CONFIG_PATH="`path filesystem`/usr/local/ssl/lib/pkgconfig" DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`path filesystem`/include -L`path filesystem`/usr/local/ssl/lib -L`path filesystem`/lib" LDLIBS+=-lpthread V=1 USE_OPENSSL=1 make -j${PROCESSORS_NUMBER} all_noverify CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
 	assert_no_error
-	DESTDIR=`path filesystem` NLLIBS="-lnl -lnl-genl" NLLIBNAME=libnl-3.0 CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`path filesystem`/include -L`path filesystem`/usr/local/ssl/lib -L`path filesystem`/lib" LDLIBS+=-lm USE_OPENSSL=1 UDEV_RULE_DIR="etc/udev/rules.d/" make -j${PROCESSORS_NUMBER} install CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
-	assert_no_error
+        PREFIX=`path filesystem` DESTDIR=`path filesystem` make install
+        assert_no_error
 	cd_back
 }
 
@@ -307,7 +307,7 @@ function build_calibrator()
 	cd_repo ti_utils
 	[ -z $NO_CLEAN ] && NFSROOT=`path filesystem` make clean
 	[ -z $NO_CLEAN ] && assert_no_error
-	NFSROOT=`path filesystem` make
+	NLVER=3 NLROOT=`repo_path libnl`/include NFSROOT=`path filesystem` LIBS+=-lpthreadmake
 	assert_no_error
 	NFSROOT=`path filesystem` make install
 	#assert_no_error
