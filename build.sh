@@ -429,9 +429,9 @@ files_to_verify=(
 `path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
 "ELF 32-bit LSB relocatable, ARM"
 
-`path filesystem`/usr/bin/calibrator
-`repo_path ti_utils`/calibrator
-"ELF 32-bit LSB executable, ARM"
+#`path filesystem`/usr/bin/calibrator
+#`repo_path ti_utils`/calibrator
+#"ELF 32-bit LSB executable, ARM"
 
 `path filesystem`/usr/sbin/wlconf/wlconf
 `repo_path ti_utils`/wlconf/wlconf

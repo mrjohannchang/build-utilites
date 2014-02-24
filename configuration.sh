@@ -70,7 +70,7 @@ https://github.com/tgraf/libnl.git
 libnl3_2_24
 
 crda
-https://github.com/mcgrof/crda.git
+git@git.ti.com:wilink8-wlan/crda.git
 master
 
 wireless_regdb
@@ -91,7 +91,7 @@ master
 
 fw_download
 git@git.ti.com:wilink8-wlan/wl18xx_fw.git
-mbss
+ap_dfs
 
 scripts_download
 git@git.ti.com:wilink8-wlan/wl18xx-target-scripts.git
