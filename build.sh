@@ -297,7 +297,7 @@ function build_crda()
 	[ -z $NO_CLEAN ] && assert_no_error
         PKG_CONFIG_LIBDIR="`path filesystem`/lib/pkgconfig" PKG_CONFIG_PATH="`path filesystem`/usr/local/ssl/lib/pkgconfig" DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`path filesystem`/include -L`path filesystem`/usr/local/ssl/lib -L`path filesystem`/lib" LDLIBS+=-lpthread V=1 USE_OPENSSL=1 make -j${PROCESSORS_NUMBER} all_noverify CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
 	assert_no_error
-        PREFIX=`path filesystem` DESTDIR=`path filesystem` make install
+        DESTDIR=`path filesystem` make install
         assert_no_error
 	cd_back
 }
