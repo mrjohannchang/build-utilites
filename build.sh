@@ -172,7 +172,7 @@ function setup_branches()
 		git checkout $branch        
         git fetch origin
         git fetch origin --tags  
-        if [[ "$url" == *TI-OpenLink* ]]
+        if [[ "$url" == *git.ti.com* ]]
         then            
            [[ -n $RESET ]] && echo -e "${PURPLE}Reset to latest in repo ${GREEN}$name ${NORMAL} branch  ${GREEN}$branch ${NORMAL}"  && git reset --hard origin/$branch
            [[ -n $USE_TAG ]] && git reset --hard $USE_TAG  && echo -e "${NORMAL}Reset to tag ${GREEN}$USE_TAG   ${NORMAL}in repo ${GREEN}$name ${NORMAL} "            
@@ -468,7 +468,7 @@ function admin_tag()
         branch=${repositories[$i + 2]}   
         checkout_type="branch"              
         cd_repo $name    
-        if [[ "$url" == *TI-OpenLink* ]]
+        if [[ "$url" == *git.ti.com* ]]
         then                                   
                 echo -e "${PURPLE}Adding tag ${GREEN} $1 ${NORMAL} to repo : ${GREEN}$name ${NORMAL} "  ;
                 git show --summary        
