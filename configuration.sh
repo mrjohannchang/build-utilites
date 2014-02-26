@@ -58,7 +58,7 @@ repositories=(
 # branch
 
 kernel
-git@git.ti.com:wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
+git://git.ti.com:wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
 ti-linux-3.8.y-wlcore
 
 openssl
@@ -70,7 +70,7 @@ https://github.com/tgraf/libnl.git
 libnl3_2_24
 
 crda
-git@git.ti.com:wilink8-wlan/crda.git
+git://git.ti.com:wilink8-wlan/crda.git
 master
 
 wireless_regdb
@@ -78,26 +78,26 @@ https://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
 master
 
 driver
-git@git.ti.com:wilink8-wlan/wl18xx.git
+git://git.ti.com:wilink8-wlan/wl18xx.git
 ap_dfs
 
 hostap
-git@git.ti.com:wilink8-wlan/hostap.git
+git://git.ti.com:wilink8-wlan/hostap.git
 single_hostap
 
 ti_utils
-git@git.ti.com:wilink8-wlan/18xx-ti-utils.git
+git://git.ti.com:wilink8-wlan/18xx-ti-utils.git
 master
 
 fw_download
-git@git.ti.com:wilink8-wlan/wl18xx_fw.git
+git://git.ti.com:wilink8-wlan/wl18xx_fw.git
 ap_dfs
 
 scripts_download
-git@git.ti.com:wilink8-wlan/wl18xx-target-scripts.git
+git://git.ti.com:wilink8-wlan/wl18xx-target-scripts.git
 sitara-mbss
 
 backports
-git@git.ti.com:wilink8-wlan/backports.git
+git://git.ti.com:wilink8-wlan/backports.git
 ap_dfs
 )
