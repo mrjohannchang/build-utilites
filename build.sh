@@ -307,7 +307,7 @@ function build_calibrator()
 	cd_repo ti_utils
 	[ -z $NO_CLEAN ] && NFSROOT=`path filesystem` make clean
 	[ -z $NO_CLEAN ] && assert_no_error
-	NLVER=3 NLROOT=`repo_path libnl`/include NFSROOT=`path filesystem` LIBS+=-lpthreadmake
+	NLVER=3 NLROOT=`repo_path libnl`/include NFSROOT=`path filesystem` LIBS+=-lpthread make
 	assert_no_error
 	NFSROOT=`path filesystem` make install
 	#assert_no_error
