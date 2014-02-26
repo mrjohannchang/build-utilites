@@ -198,9 +198,9 @@ function build_uimage()
 	[ -z $NO_CLEAN ] && assert_no_error
 	make -j${PROCESSORS_NUMBER} uImage
 	assert_no_error
-	LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage-dtb.am335x-evm
+	#LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage-dtb.am335x-evm
 	assert_no_error
-	cp `repo_path kernel`/arch/arm/boot/uImage-dtb.am335x-evm `path tftp`/uImage
+	cp `repo_path kernel`/arch/arm/boot/uImage `path tftp`/uImage
 	cd_back
 }
 
@@ -419,11 +419,11 @@ files_to_verify=(
 `repo_path fw_download`/wl18xx-fw-4.bin
 "data"
 
-`path filesystem`/lib/modules/3.8.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
+`path filesystem`/lib/modules/3.2.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
 `path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
 "ELF 32-bit LSB relocatable, ARM"
 
-`path filesystem`/lib/modules/3.8.*/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
+`path filesystem`/lib/modules/3.2.*/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
 `path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
 "ELF 32-bit LSB relocatable, ARM"
 

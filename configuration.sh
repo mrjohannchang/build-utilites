@@ -59,7 +59,7 @@ repositories=(
 
 kernel
 git://git.ti.com/wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
-ti-linux-3.8.y-wlcore
+ti-linux-3.2.y-AM335x-PSP
 
 openssl
 https://github.com/ariknem/openssl.git
@@ -79,7 +79,7 @@ master
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
-ap_dfs
+ap_dfs_32
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
@@ -99,5 +99,5 @@ sitara-mbss
 
 backports
 git://git.ti.com/wilink8-wlan/backports.git
-ap_dfs
+ap_dfs_32
 )
