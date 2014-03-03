@@ -36,12 +36,10 @@ function usage ()
     echo "                     scripts "
     echo "                     calibrator "
     echo "                     wlconf "
-    echo "                     calibrator "
-    echo "                      "
     echo "                     uimage "
     echo "                     openssl "
     echo "                     libnl "
-    echo "                     crda "    
+    echo "                     crda "
 
 	exit 1
 }
@@ -425,7 +423,7 @@ files_to_verify=(
 `path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
 "ELF 32-bit LSB relocatable, ARM"
 
-`path filesystem`/lib/modules/3.8.13+/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
+`path filesystem`/lib/modules/3.8.*/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
 `path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
 "ELF 32-bit LSB relocatable, ARM"
 
