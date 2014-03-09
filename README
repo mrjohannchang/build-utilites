@@ -1,0 +1,3 @@
+This repository contains the build scripts required to build Wilik8 with different configurations/kernels
+
+Start with ./wl18xx_build.sh -h
