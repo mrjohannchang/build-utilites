@@ -402,11 +402,14 @@ function clean_outputs()
 
 function build_outputs()
 {
-	echo "Building outputs"    
-	cd_path filesystem
-	tar cpjf `path outputs`/${tar_filesystem[0]} .
-	cd_back
-	cp `path tftp`/uImage `path outputs`/uImage
+	if [[ "$ROOTFS" == "DEFAULT" ]]
+    then  
+        echo "Building outputs"    
+        cd_path filesystem
+        tar cpjf `path outputs`/${tar_filesystem[0]} .
+        cd_back
+        cp `path tftp`/uImage `path outputs`/uImage
+    fi
 }
 
 function install_outputs()
@@ -630,7 +633,7 @@ function main()
         
         'clean')        
         print_highlight " cleaning & building all "       
-		clean_outputs
+		#clean_outputs
         setup_directories
         build_all        
 		;;
