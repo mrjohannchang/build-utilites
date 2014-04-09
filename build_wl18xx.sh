@@ -350,7 +350,7 @@ function build_calibrator()
 
 function build_wlconf()
 {
-	files_to_copy="dictionary.txt struct.bin wl18xx-conf-default.bin README example.conf example.ini"
+	files_to_copy="dictionary.txt struct.bin wl18xx-conf-default.bin README example.conf example.ini configure-device.sh"
 	cd `repo_path ti_utils`/wlconf
 	if [ -z $NO_CLEAN ]; then
 		NFSROOT=`path filesystem` make clean
