@@ -65,11 +65,11 @@ master
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
-ap_dfs_32
+ap_dfs_mbss_all
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
-single_hostap
+single_hostap_dfs
 
 ti_utils
 git://git.ti.com/wilink8-wlan/18xx-ti-utils.git
@@ -85,5 +85,5 @@ sitara-mbss
 
 backports
 git://git.ti.com/wilink8-wlan/backports.git
-ap_dfs_32
+ap_dfs_mbss_all
 )
