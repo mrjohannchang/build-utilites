@@ -199,8 +199,8 @@ function setup_branches()
 		url=${repositories[$i + 1]}
         branch=${repositories[$i + 2]}   
         checkout_type="branch"       
-        #for all the openlink repo. we use a tag if provided.
-        [ ! "$name" != "kernel" -o "$DEFAULT_KERNEL" ] && i=$[$i + 3] && continue
+        #for all the openlink repo. we use a tag if provided.        
+        [ "$name" == "kernel" ] && [ -z "$DEFAULT_KERNEL" ] && i=$[$i + 3] && continue
         cd_repo $name    
         echo -e "\n${NORMAL}Checking out branch ${GREEN}$branch  ${NORMAL}in repo ${GREEN}$name ${NORMAL} "
 		git checkout $branch        
