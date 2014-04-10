@@ -151,7 +151,8 @@ function setup_environment()
 	export LIBNL_PATH=`repo_path libnl`	
 	export KLIB=${KERNEL_PATH}
 	export KLIB_BUILD=${KERNEL_PATH}
-    export PATH=$TOOLCHAIN_PATH:$PATH
+        export GIT_TREE=`repo_path driver`
+        export PATH=$TOOLCHAIN_PATH:$PATH
     
 }
 
