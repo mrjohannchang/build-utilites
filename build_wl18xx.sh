@@ -18,13 +18,13 @@ function print_highlight()
 
 function usage ()
 {
-	echo ""
-    echo "This script compiles one/all of the following utilities: kernel, libnl, openssl, hostapd, wpa_supplicant,wl18xx_modules,firmware,crda,calibrator"
-	echo "by calling specific utility name and action."
     echo ""
-	echo " Usage: ./wl18xx_build.sh init         <head|TAG>  [ Update w/o build        ] "
-	echo "                          update       <head|TAG>  [ Update & build          ] "
-	echo "                          rebuild                  [ Build w/o update        ] "
+    echo "This script compiles one/all of the following utilities: kernel, libnl, openssl, hostapd, wpa_supplicant,wl18xx_modules,firmware,crda,calibrator"
+    echo "by calling specific utility name and action."
+    echo ""
+    echo " Usage: ./wl18xx_build.sh init         <head|TAG>  [ Update w/o build        ] "
+    echo "                          update       <head|TAG>  [ Update & build          ] "
+    echo "                          rebuild                  [ Build w/o update        ] "
     echo "                          clean                    [ Clean, Update & build   ] "
     echo "                              "
     echo " Building a specific module usage "
@@ -40,7 +40,7 @@ function usage ()
     echo "                     libnl "
     echo "                     crda "
 
-	exit 1
+    exit 1
 }
 
 function assert_no_error()
@@ -49,7 +49,7 @@ function assert_no_error()
 		echo "****** ERROR $? $@*******"
 		exit 1
 	fi
-    echo "****** $1 *******"
+        echo "****** $1 *******"
 }
 
 function repo_id()
@@ -109,6 +109,30 @@ function cd_back()
 	cd - > /dev/null
 }
 
+function read_kernel_version()
+{
+        filename=`repo_path kernel`/Makefile
+
+        if [ ! -f $filename ]
+        then
+            KERNEL_VERSION=0
+            KERNEL_PATCHLEVEL=0
+            KERNEL_SUBLEVEL=0
+            echo "No Makefile was found. Kernel version was set to default." 
+        else 
+            exec 6< $filename
+            read version <&6
+            read patchlevel <&6
+            read sublevel <&6
+            exec 6<&-
+
+            KERNEL_VERSION=$(echo $version|sed 's/[^0-9]//g')
+            KERNEL_PATCHLEVEL=$(echo $patchlevel|sed 's/[^0-9]//g')
+            KERNEL_SUBLEVEL=$(echo $sublevel|sed 's/[^0-9]//g')
+            echo "Makefile was found. Kernel version was set to $KERNEL_VERSION.$KERNEL_PATCHLEVEL.$KERNEL_SUBLEVEL." 
+        fi
+}
+
 #----------------------------------------------------------j
 function setup_environment()
 {
@@ -125,7 +149,6 @@ function setup_environment()
         set_path filesystem $ROOTFS
         [ ! -d $ROOTFS ] && echo "Error ROOTFS: $ROOTFS dir does not exist" && exit 1
     fi   
-    echo "!!!!!!!!!!!!!   `path filesystem`  "
     #if no toolchain path is set - download it.
     if [[ "$TOOLCHAIN_PATH" == "DEFAULT" ]]
     then            
@@ -230,12 +253,17 @@ function setup_toolchain()
 function build_uimage()
 {
 	cd_repo kernel
-	[ -z $NO_CONFIG ] && cp `path configuration`/kernel.config `repo_path kernel`/.config
+	[ -z $NO_CONFIG ] && cp `path configuration`/kernel_$KERNEL_VERSION.$KERNEL_PATCHLEVEL.config `repo_path kernel`/.config
 	[ -z $NO_CLEAN ] && make clean
 	[ -z $NO_CLEAN ] && assert_no_error
-	make -j${PROCESSORS_NUMBER} uImage
-	assert_no_error
-	#LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage-dtb.am335x-evm
+       
+        if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
+        then
+	    make -j${PROCESSORS_NUMBER} uImage
+        else
+            LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm
+        fi
+        
 	assert_no_error
 	cp `repo_path kernel`/arch/arm/boot/uImage `path tftp`/uImage
 	cd_back
@@ -434,47 +462,50 @@ function install_outputs()
 	cd_back
 }
 
-files_to_verify=(
-# skeleton path
-# source path
-# pattern in output of file
+function set_files_to_verify()
+{
+        files_to_verify=(
+        # skeleton path
+        # source path
+        # pattern in output of file
 
-`path filesystem`/usr/local/sbin/wpa_supplicant
-`repo_path hostap`/wpa_supplicant/wpa_supplicant
-"ELF 32-bit LSB executable, ARM"
+        `path filesystem`/usr/local/sbin/wpa_supplicant
+        `repo_path hostap`/wpa_supplicant/wpa_supplicant
+        "ELF 32-bit LSB executable, ARM"
 
-`path filesystem`/usr/local/bin/hostapd
-`repo_path hostap`/hostapd/hostapd
-"ELF 32-bit LSB executable, ARM"
+        `path filesystem`/usr/local/bin/hostapd
+        `repo_path hostap`/hostapd/hostapd
+        "ELF 32-bit LSB executable, ARM"
 
-`path filesystem`/sbin/crda
-`repo_path crda`/crda
-"ELF 32-bit LSB executable, ARM"
+        `path filesystem`/sbin/crda
+        `repo_path crda`/crda
+        "ELF 32-bit LSB executable, ARM"
 
-`path filesystem`/usr/lib/crda/regulatory.bin
-`repo_path wireless_regdb`/regulatory.bin
-"CRDA wireless regulatory database file"
+        `path filesystem`/usr/lib/crda/regulatory.bin
+        `repo_path wireless_regdb`/regulatory.bin
+        "CRDA wireless regulatory database file"
 
-`path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-4.bin
-`repo_path fw_download`/wl18xx-fw-4.bin
-"data"
+        `path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-4.bin
+        `repo_path fw_download`/wl18xx-fw-4.bin
+        "data"
 
-`path filesystem`/lib/modules/3.2.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
-`path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
-"ELF 32-bit LSB relocatable, ARM"
+        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
+        `path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
+        "ELF 32-bit LSB relocatable, ARM"
 
-`path filesystem`/lib/modules/3.2.*/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
-`path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
-"ELF 32-bit LSB relocatable, ARM"
+        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
+        `path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
+        "ELF 32-bit LSB relocatable, ARM"
 
-#`path filesystem`/usr/bin/calibrator
-#`repo_path ti_utils`/calibrator
-#"ELF 32-bit LSB executable, ARM"
+        #`path filesystem`/usr/bin/calibrator
+        #`repo_path ti_utils`/calibrator
+        #"ELF 32-bit LSB executable, ARM"
 
-`path filesystem`/usr/sbin/wlconf/wlconf
-`repo_path ti_utils`/wlconf/wlconf
-"ELF 32-bit LSB executable, ARM"
-)
+        `path filesystem`/usr/sbin/wlconf/wlconf
+        `repo_path ti_utils`/wlconf/wlconf
+        "ELF 32-bit LSB executable, ARM"
+        )
+}
 
 function get_tag()
 {
@@ -530,6 +561,8 @@ function verify_skeleton()
 {
 	echo "Verifying filesystem skeleton..."
 
+        set_files_to_verify
+
 	i="0"
 	while [ $i -lt ${#files_to_verify[@]} ]; do
 		skeleton_path=${files_to_verify[i]}
@@ -565,13 +598,13 @@ function setup_workspace()
 	setup_branches
     #Download toolchain only if it was not set
     [ DEFAULT_TOOLCHAIN ] && setup_toolchain   
-
-    
 }
 
 
 function build_all()
 {
+    read_kernel_version
+
     if [ -z $NO_EXTERNAL ] 
     then        
         [ $DEFAULT_KERNEL ] && build_uimage
@@ -608,8 +641,6 @@ function main()
     setup_environment
     setup_directories
     
-     
-    
 	case "$1" in
 		'update')                
         print_highlight " setting up workspace and building all "       
@@ -630,12 +661,13 @@ function main()
 		[[  -n "$2" ]] && echo "Using tag $2 " && USE_TAG=$2                
         NO_BUILD=1 
         setup_workspace
+        read_kernel_version
 		;;
         
         
         'clean')        
         print_highlight " cleaning & building all "       
-		#clean_outputs
+        clean_outputs
         setup_directories
         build_all        
 		;;
