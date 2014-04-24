@@ -3,7 +3,7 @@ fs_skeleton.tbz2
 )
 
 toolchain=(
-https://sourcery.mentor.com/GNUToolchain/package6488/public/arm-none-linux-gnueabi/arm-2010q1-202-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2
+https://sourcery.mentor.com/GNUToolchain/package11447/public/arm-none-linux-gnueabi/arm-2013.05-24-arm-none-linux-gnueabi-i686-pc-linux-gnu.tar.bz2
 )
 
 paths=(
@@ -45,7 +45,7 @@ repositories=(
 
 kernel
 git://git.ti.com/wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
-ti-linux-3.2.y-AMSDK-6
+ti-linux-3.12.y-wlcore_wow
 
 openssl
 https://github.com/openssl/openssl
@@ -69,7 +69,7 @@ ap_dfs_mbss_all
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
-single_hostap_dfs
+single_hostap_dfs_dynamic
 
 ti_utils
 git://git.ti.com/wilink8-wlan/18xx-ti-utils.git
