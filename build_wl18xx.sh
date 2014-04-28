@@ -223,9 +223,9 @@ function setup_branches()
 		url=${repositories[$i + 1]}
         branch=${repositories[$i + 2]}   
         checkout_type="branch"       
-        #for all the openlink repo. we use a tag if provided.        
+        #for all the openlink repo. we use a tag if provided.               
         [ "$name" == "kernel" ] && [ -z "$DEFAULT_KERNEL" ] && i=$[$i + 3] && continue
-        cd_repo $name    
+        cd_repo $name 	
         echo -e "\n${NORMAL}Checking out branch ${GREEN}$branch  ${NORMAL}in repo ${GREEN}$name ${NORMAL} "
 		git checkout $branch        
         git fetch origin
@@ -252,20 +252,26 @@ function setup_toolchain()
 
 function build_uimage()
 {
-	cd_repo kernel
+    cd_repo kernel
 	[ -z $NO_CONFIG ] && cp `path configuration`/kernel_$KERNEL_VERSION.$KERNEL_PATCHLEVEL.config `repo_path kernel`/.config
 	[ -z $NO_CLEAN ] && make clean
 	[ -z $NO_CLEAN ] && assert_no_error
        
-        if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
-        then
-	    make -j${PROCESSORS_NUMBER} uImage
-        else
-            LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm
-        fi
+    make -j${PROCESSORS_NUMBER} uImage
+	
+    #TODO: Add support for kernel compilation with dtb file integrated to uImage:
+    #LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm
+		
+    if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
+    then
+        cp `repo_path kernel`/arch/arm/boot/uImage `path tftp`/uImage
+    else		
+        make -j${PROCESSORS_NUMBER} am335x-evm.dtb
+        cp `repo_path kernel`/arch/arm/boot/zImage `path tftp`/zImage
+        cp `repo_path kernel`/arch/arm/boot/dts/am335x-evm.dtb `path tftp`/am335x-evm.dtb
+    fi
         
 	assert_no_error
-	cp `repo_path kernel`/arch/arm/boot/uImage `path tftp`/uImage
 	cd_back
 }
 
@@ -421,9 +427,16 @@ function build_scripts_download()
 	cd_back
 }
 
+function clean_kernel()
+{
+	echo "Cleaning kernel folder"
+	cd_repo kernel
+	git clean -fdx > /dev/null	
+}
+
 function clean_outputs()
 {
-	echo "Cleaning outputs"    
+	echo "Cleaning outputs"   
     rm -rf `path filesystem`/*
     rm -f `path outputs`/${tar_filesystem[0]}
 	rm -f `path outputs`/uImage
@@ -438,7 +451,14 @@ function build_outputs()
         cd_path filesystem
         tar cpjf `path outputs`/${tar_filesystem[0]} .
         cd_back
-        cp `path tftp`/uImage `path outputs`/uImage
+		
+        if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
+        then
+            cp `path tftp`/uImage `path outputs`/uImage
+        else		       
+            cp `path tftp`/zImage `path outputs`/zImage
+            cp `path tftp`/am335x-evm.dtb `path outputs`/am335x-evm.dtb
+        fi		
     fi
 }
 
@@ -651,7 +671,9 @@ function main()
         else
             print_highlight "Updating all to head (this will revert local changes)" 
             RESET=1    
-        fi        
+        fi
+		clean_kernel
+        clean_outputs        
         setup_workspace
         build_all
 		;;
@@ -663,8 +685,7 @@ function main()
         setup_workspace
         read_kernel_version
 		;;
-        
-        
+              
         'clean')        
         print_highlight " cleaning & building all "       
         clean_outputs
@@ -684,6 +705,7 @@ function main()
         #################### Building single components #############################
 		'kernel')
 		print_highlight " building only Kernel "
+		read_kernel_version
 		build_uimage
 		;;
 
@@ -694,8 +716,7 @@ function main()
 
 		'wpa_supplicant')
         print_highlight " building only wpa_supplicant "
-		build_wpa_supplicant
-        
+		build_wpa_supplicant      
 		;;
 
 		'hostapd')
@@ -712,6 +733,7 @@ function main()
         print_highlight " Copying scripts "
 		build_scripts_download
 		;;
+		
         'utils')
         print_highlight " building only ti-utils "
         build_calibrator
