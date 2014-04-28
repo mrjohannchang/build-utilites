@@ -45,7 +45,7 @@ repositories=(
 
 kernel
 git://git.ti.com/wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
-ti-linux-3.12.y-wlcore_wow
+ti-linux-3.12.y-AMSDK-7
 
 openssl
 https://github.com/openssl/openssl
