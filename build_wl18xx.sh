@@ -623,8 +623,6 @@ function setup_workspace()
 
 function build_all()
 {
-    read_kernel_version
-
     if [ -z $NO_EXTERNAL ] 
     then        
         [ $DEFAULT_KERNEL ] && build_uimage
@@ -645,7 +643,6 @@ function build_all()
     fi
     
     [ -z $NO_VERIFY ] && verify_skeleton
-    
 }
 
 function setup_and_build()
@@ -660,6 +657,7 @@ function main()
 
     setup_environment
     setup_directories
+    read_kernel_version
     
 	case "$1" in
 		'update')                
@@ -672,9 +670,10 @@ function main()
             print_highlight "Updating all to head (this will revert local changes)" 
             RESET=1    
         fi
-		clean_kernel
+        clean_kernel
         clean_outputs        
         setup_workspace
+        read_kernel_version #####read kernel version again after update#####
         build_all
 		;;
         
@@ -683,7 +682,7 @@ function main()
 		[[  -n "$2" ]] && echo "Using tag $2 " && USE_TAG=$2                
         NO_BUILD=1 
         setup_workspace
-        read_kernel_version
+        read_kernel_version #####read kernel version again after init#####
 		;;
               
         'clean')        
@@ -705,7 +704,6 @@ function main()
         #################### Building single components #############################
 		'kernel')
 		print_highlight " building only Kernel "
-		read_kernel_version
 		build_uimage
 		;;
 
