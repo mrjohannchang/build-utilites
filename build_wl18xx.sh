@@ -257,20 +257,22 @@ function build_uimage()
 	[ -z $NO_CLEAN ] && make clean
 	[ -z $NO_CLEAN ] && assert_no_error
        
-    make -j${PROCESSORS_NUMBER} uImage
-	
-    #TODO: Add support for kernel compilation with dtb file integrated to uImage:
-    #LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm
-		
     if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
     then
+        make -j${PROCESSORS_NUMBER} uImage
         cp `repo_path kernel`/arch/arm/boot/uImage `path tftp`/uImage
-    else		
-        make -j${PROCESSORS_NUMBER} am335x-evm.dtb
-        cp `repo_path kernel`/arch/arm/boot/zImage `path tftp`/zImage
-        cp `repo_path kernel`/arch/arm/boot/dts/am335x-evm.dtb `path tftp`/am335x-evm.dtb
+    else
+        if [ -z $NO_DTB ] 
+        then
+            make -j${PROCESSORS_NUMBER} uImage
+            make -j${PROCESSORS_NUMBER} am335x-evm.dtb
+            cp `repo_path kernel`/arch/arm/boot/zImage `path tftp`/zImage
+            cp `repo_path kernel`/arch/arm/boot/dts/am335x-evm.dtb `path tftp`/am335x-evm.dtba
+        else
+            LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm 
+            cp `repo_path kernel`/arch/arm/boot/uImage.am335x-evm `path tftp`/uImage
+        fi
     fi
-        
 	assert_no_error
 	cd_back
 }
@@ -455,9 +457,14 @@ function build_outputs()
         if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
         then
             cp `path tftp`/uImage `path outputs`/uImage
-        else		       
-            cp `path tftp`/zImage `path outputs`/zImage
-            cp `path tftp`/am335x-evm.dtb `path outputs`/am335x-evm.dtb
+        else
+            if [ -z $NO_DTB ]
+            then
+                cp `path tftp`/zImage `path outputs`/zImage
+                cp `path tftp`/am335x-evm.dtb `path outputs`/am335x-evm.dtb
+            else
+                cp `path tftp`/uImage `path outputs`/uImage
+            fi
         fi		
     fi
 }
@@ -704,6 +711,7 @@ function main()
         #################### Building single components #############################
 		'kernel')
 		print_highlight " building only Kernel "
+                clean_kernel
 		build_uimage
 		;;
 
