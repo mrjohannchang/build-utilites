@@ -735,6 +735,16 @@ function main()
 		build_crda
 		;;
         
+		'libnl')
+		print_highlight " building only libnl"
+		build_libnl
+		;;
+
+		'openssl')
+		print_highlight " building only openssl"
+		build_openssl
+		;;
+
         'scripts')
         print_highlight " Copying scripts "
 		build_scripts_download
