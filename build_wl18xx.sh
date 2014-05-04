@@ -267,7 +267,7 @@ function build_uimage()
             make -j${PROCESSORS_NUMBER} uImage
             make -j${PROCESSORS_NUMBER} am335x-evm.dtb
             cp `repo_path kernel`/arch/arm/boot/zImage `path tftp`/zImage
-            cp `repo_path kernel`/arch/arm/boot/dts/am335x-evm.dtb `path tftp`/am335x-evm.dtba
+            cp `repo_path kernel`/arch/arm/boot/dts/am335x-evm.dtb `path tftp`/am335x-evm.dtb
         else
             LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm 
             cp `repo_path kernel`/arch/arm/boot/uImage.am335x-evm `path tftp`/uImage
