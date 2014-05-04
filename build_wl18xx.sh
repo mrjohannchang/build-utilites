@@ -321,7 +321,7 @@ function build_libnl()
 	cd_repo libnl
 	[ -z $NO_CONFIG ] && ./autogen.sh
 	[ -z $NO_CONFIG ] && ./configure --prefix=`path filesystem` --host=${ARCH} CC=${CROSS_COMPILE}gcc AR=${CROSS_COMPILE}ar
-	[ -z $NO_CLEAN ] && make clean
+	([ -z $NO_CONFIG ] || [ -z $NO_CLEAN ]) && make clean
 	[ -z $NO_CLEAN ] && assert_no_error
 	make
 	assert_no_error
