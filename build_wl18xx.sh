@@ -306,7 +306,7 @@ function build_modules()
 function build_openssl()
 {
 	cd_repo openssl
-	[ -z $NO_CONFIG ] && ./Configure s/compiler:gcc
+	[ -z $NO_CONFIG ] && ./Configure linux-generic32
 	[ -z $NO_CLEAN ] && make clean
 	[ -z $NO_CLEAN ] && assert_no_error
 	make
