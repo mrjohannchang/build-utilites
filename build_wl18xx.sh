@@ -714,7 +714,12 @@ function main()
                 clean_kernel
 		build_uimage
 		;;
-
+		
+                'kernel_modules')
+        print_highlight " building only Driver modules "
+                build_uimage
+		build_modules
+                ;;
 		'modules')
         print_highlight " building only Driver modules "
 		build_modules
