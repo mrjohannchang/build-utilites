@@ -111,7 +111,7 @@ function cd_back()
 
 function read_kernel_version()
 {
-        filename=`repo_path kernel`/Makefile
+        filename=$KERNEL_PATH/Makefile
 
         if [ ! -f $filename ]
         then
@@ -431,25 +431,25 @@ function build_scripts_download()
 
 function clean_kernel()
 {
-	echo "Cleaning kernel folder"
-	cd_repo kernel
-	git clean -fdx > /dev/null	
+	[ "$DEFAULT_KERNEL" ] && echo "Cleaning kernel folder"
+	[ "$DEFAULT_KERNEL" ] && cd_repo kernel
+	[ "$DEFAULT_KERNEL" ] && git clean -fdx > /dev/null
 }
 
 function clean_outputs()
 {
     if [[ "$ROOTFS" == "DEFAULT" ]]
     then
-	echo "Cleaning outputs"   
+        echo "Cleaning outputs"
         rm -rf `path filesystem`/*
         rm -f `path outputs`/${tar_filesystem[0]}
 	rm -f `path outputs`/uImage
-    fi
+   fi
 }
 
 function build_outputs()
 {
-    if [[ "$ROOTFS" == "DEFAULT" ]]
+	if [[ "$ROOTFS" == "DEFAULT" ]]
     then  
         echo "Building outputs"    
         cd_path filesystem
