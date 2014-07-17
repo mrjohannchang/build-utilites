@@ -438,16 +438,18 @@ function clean_kernel()
 
 function clean_outputs()
 {
+    if [[ "$ROOTFS" == "DEFAULT" ]]
+    then
 	echo "Cleaning outputs"   
-    rm -rf `path filesystem`/*
-    rm -f `path outputs`/${tar_filesystem[0]}
+        rm -rf `path filesystem`/*
+        rm -f `path outputs`/${tar_filesystem[0]}
 	rm -f `path outputs`/uImage
-	
+    fi
 }
 
 function build_outputs()
 {
-	if [[ "$ROOTFS" == "DEFAULT" ]]
+    if [[ "$ROOTFS" == "DEFAULT" ]]
     then  
         echo "Building outputs"    
         cd_path filesystem
