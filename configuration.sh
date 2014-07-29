@@ -61,7 +61,7 @@ master
 
 wireless_regdb
 https://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
-master
+master-2013-11-27
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
