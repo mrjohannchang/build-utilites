@@ -109,6 +109,19 @@ function cd_back()
 	cd - > /dev/null
 }
 
+function check_for_build_updates()
+{
+        count=`git status -uno | grep behind | wc -l`
+        if [ $count -ne 0 ]
+        then
+                echo ""
+		echo "*** Please note, there is an updated build script avilalable ***"
+		echo "*** Use 'git pull' to get the latest update. ***" 
+		echo ""
+		sleep 5
+        fi
+}
+
 function read_kernel_version()
 {
         filename=$KERNEL_PATH/Makefile
@@ -172,7 +185,7 @@ function setup_environment()
 	export PKG_CONFIG_PATH=`path filesystem`/lib/pkgconfig
 	export INSTALL_PREFIX=`path filesystem`
 	export LIBNL_PATH=`repo_path libnl`	
-	export KLIB=${KERNEL_PATH}
+	export KLIB=`path filesystem`
 	export KLIB_BUILD=${KERNEL_PATH}
         export GIT_TREE=`repo_path driver`
         export PATH=$TOOLCHAIN_PATH:$PATH
@@ -286,18 +299,19 @@ function generate_compat()
 
 function build_modules()
 {
-    generate_compat
+	generate_compat
 	cd_repo compat_wireless
 	if [ -z $NO_CLEAN ]; then
 		make clean
 	fi
 	make defconfig-wl18xx
-    make -j${PROCESSORS_NUMBER} 
+	make -j${PROCESSORS_NUMBER}
 	assert_no_error
 	find . -name \*.ko -exec cp {} `path debugging`/ \;
 	find . -name \*.ko -exec ${CROSS_COMPILE}strip -g {} \;
     
-	make -C ${KERNEL_PATH} M=`pwd` "INSTALL_MOD_PATH=`path filesystem`" modules_install
+#	make -C ${KERNEL_PATH} M=`pwd` "INSTALL_MOD_PATH=`path filesystem`" modules_install
+	make  modules_install
 	assert_no_error
 	#chmod -R 0777 ${PATH__FILESYSTEM}/lib/modules/
 	cd_back
@@ -405,6 +419,7 @@ function build_wlconf()
 	chmod 755 `path filesystem`/usr/sbin/wlconf
 	for file_to_copy in $files_to_copy; do
 		cp $file_to_copy `path filesystem`/usr/sbin/wlconf/$file_to_copy
+		echo "echoying files $file_to_copy"
 	done
 	cp official_inis/* `path filesystem`/usr/sbin/wlconf/official_inis/
 	cd_back
@@ -518,11 +533,11 @@ function set_files_to_verify()
         `repo_path fw_download`/wl18xx-fw-4.bin
         "data"
 
-        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/extra/drivers/net/wireless/ti/wl18xx/wl18xx.ko
+        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/updates/drivers/net/wireless/ti/wl18xx/wl18xx.ko
         `path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
         "ELF 32-bit LSB relocatable, ARM"
 
-        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/extra/drivers/net/wireless/ti/wlcore/wlcore.ko
+        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/updates/drivers/net/wireless/ti/wlcore/wlcore.ko
         `path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
         "ELF 32-bit LSB relocatable, ARM"
 
@@ -663,7 +678,7 @@ function setup_and_build()
 function main()
 {
 	[[ "$1" == "-h" || "$1" == "--help"  ]] && usage
-
+    check_for_build_updates
     setup_environment
     setup_directories
     read_kernel_version
