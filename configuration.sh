@@ -86,4 +86,8 @@ sitara-mbss
 backports
 git://git.ti.com/wilink8-wlan/backports.git
 ap_dfs_mbss_all
+
+iw
+https://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git
+v3.15
 )

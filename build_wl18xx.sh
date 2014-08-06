@@ -330,6 +330,18 @@ function build_openssl()
 	cd_back
 }
 
+
+function build_iw()
+{
+	cd_repo iw
+	[ -z $NO_CLEAN ] && make clean
+	[ -z $NO_CLEAN ] && assert_no_error
+	CC=${CROSS_COMPILE}gcc LIBS+=" -lpthread -lm" make V=1
+	assert_no_error
+	DESTDIR=`path filesystem` make install
+	assert_no_error
+	cd_back
+}
 function build_libnl()
 {
 	cd_repo libnl
@@ -658,6 +670,7 @@ function build_all()
     if [ -z $NO_TI ] 
     then
         build_modules
+        build_iw
         build_wpa_supplicant
         build_hostapd	
         build_calibrator
@@ -760,6 +773,11 @@ function main()
 		'libnl')
 		print_highlight " building only libnl"
 		build_libnl
+		;;
+
+		'iw')
+		print_highlight " building only iw"
+		build_iw
 		;;
 
 		'openssl')
