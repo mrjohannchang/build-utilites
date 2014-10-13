@@ -49,7 +49,7 @@ ti-linux-3.12.y-AMSDK-7
 
 openssl
 https://github.com/openssl/openssl
-OpenSSL_1_0_1d
+OpenSSL_1_0_1g
 
 libnl
 https://github.com/tgraf/libnl.git
