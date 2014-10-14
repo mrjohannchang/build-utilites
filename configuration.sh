@@ -65,11 +65,11 @@ master-2013-11-27
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
-ap_dfs_mbss_all
+ap_p2p
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
-single_hostap_dfs_dynamic
+ap_p2p
 
 ti_utils
 git://git.ti.com/wilink8-wlan/18xx-ti-utils.git
