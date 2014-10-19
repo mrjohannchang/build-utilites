@@ -277,8 +277,10 @@ function build_uimage()
     else
         if [ -z $NO_DTB ] 
         then
-            make -j${PROCESSORS_NUMBER} uImage
+            make -j${PROCESSORS_NUMBER} zImage
             make -j${PROCESSORS_NUMBER} am335x-evm.dtb
+	    make -j${PROCESSORS_NUMBER} modules
+	    INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} modules_install
             cp `repo_path kernel`/arch/arm/boot/zImage `path tftp`/zImage
             cp `repo_path kernel`/arch/arm/boot/dts/am335x-evm.dtb `path tftp`/am335x-evm.dtb
         else
@@ -708,7 +710,7 @@ function main()
             print_highlight "Updating all to head (this will revert local changes)" 
             RESET=1    
         fi
-        clean_kernel
+        #clean_kernel
         clean_outputs        
         setup_workspace
         read_kernel_version #####read kernel version again after update#####
