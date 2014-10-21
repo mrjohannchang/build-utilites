@@ -788,16 +788,20 @@ function main()
 		build_openssl
 		;;
 
-        'scripts')
-        print_highlight " Copying scripts "
+		'scripts')
+		print_highlight " Copying scripts "
 		build_scripts_download
 		;;
 		
-        'utils')
-        print_highlight " building only ti-utils "
-        build_calibrator
-        build_wlconf		
+		'utils')
+		print_highlight " building only ti-utils "
+		build_calibrator
+		build_wlconf		
 		;;        
+		'firmware')
+                print_highlight " building only firmware"
+                build_fw_download
+                ;;
         ############################################################
         'get_tag')
         get_tag
