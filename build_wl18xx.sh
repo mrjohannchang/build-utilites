@@ -21,21 +21,21 @@ function usage ()
     echo ""
     echo "This script compiles one/all of the following utilities: kernel, libnl, openssl, hostapd, wpa_supplicant,wl18xx_modules,firmware,crda,calibrator"
     echo "by calling specific utility name and action."
+    echo "A web guide can be found here : http://processors.wiki.ti.com/index.php/WL18xx_System_Build_Scripts"
     echo ""
     echo " Usage: ./wl18xx_build.sh init         <head|TAG>  [ Update w/o build        ] "
     echo "                          update       <head|TAG>  [ Update & build          ] "
     echo "                          rebuild                  [ Build w/o update        ] "
     echo "                          clean                    [ Clean, Update & build   ] "
     echo "                              "
-    echo " Building a specific module usage "
+    echo " Building a specific component usage "
     echo "       ./build.sh    hostapd "
     echo "                     wpa_supplicant "
-    echo "                     modules(driver) "
+    echo "                     modules "
     echo "                     firmware "
     echo "                     scripts "
-    echo "                     calibrator "
-    echo "                     wlconf "
-    echo "                     uimage "
+    echo "                     utils "
+    echo "                     iw "
     echo "                     openssl "
     echo "                     libnl "
     echo "                     crda "
@@ -312,10 +312,8 @@ function build_modules()
 	find . -name \*.ko -exec cp {} `path debugging`/ \;
 	find . -name \*.ko -exec ${CROSS_COMPILE}strip -g {} \;
     
-#	make -C ${KERNEL_PATH} M=`pwd` "INSTALL_MOD_PATH=`path filesystem`" modules_install
 	make  modules_install
 	assert_no_error
-	#chmod -R 0777 ${PATH__FILESYSTEM}/lib/modules/
 	cd_back
 }
 
