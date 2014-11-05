@@ -16,6 +16,6 @@ export ROOTFS=DEFAULT
 #if DEFAULT kernel path is set - kernel will be downloaded (set branch to match kernel version)
 export KERNEL_PATH=DEFAULT
 
-export CROSS_COMPILE=arm-none-linux-gnueabi-
+export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm
 [ "$TOOLCHAIN_PATH" != "DEFAULT" ] && export PATH=$TOOLCHAIN_PATH:$PATH
