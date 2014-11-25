@@ -19,26 +19,28 @@ function print_highlight()
 function usage ()
 {
     echo ""
-    echo "This script compiles one/all of the following utilities: kernel, libnl, openssl, hostapd, wpa_supplicant,wl18xx_modules,firmware,crda,calibrator"
-    echo "by calling specific utility name and action."
+    echo "This script build all/one of the relevent wl18xx software package."
     echo "A web guide can be found here : http://processors.wiki.ti.com/index.php/WL18xx_System_Build_Scripts"
     echo ""
-    echo " Usage: ./wl18xx_build.sh init         <head|TAG>  [ Update w/o build        ] "
-    echo "                          update       <head|TAG>  [ Update & build          ] "
-    echo "                          rebuild                  [ Build w/o update        ] "
-    echo "                          clean                    [ Clean, Update & build   ] "
-    echo "                              "
-    echo " Building a specific component usage "
-    echo "       ./build.sh    hostapd "
-    echo "                     wpa_supplicant "
-    echo "                     modules "
-    echo "                     firmware "
-    echo "                     scripts "
-    echo "                     utils "
-    echo "                     iw "
-    echo "                     openssl "
-    echo "                     libnl "
-    echo "                     crda "
+    echo "Usage : "
+    echo ""
+    echo "Building full package : "
+    echo "        ./wl18xx_build.sh init         <head|TAG>  [ Download and Update w/o build  ] "
+    echo "                          update       <head|TAG>  [ Update to specific TAG & Build ] "
+    echo "                          clean                    [ Clean & Build                  ] "
+    echo "                          <empty>                  [ Build w/o update               ] "
+    echo ""
+    echo "Building specific component :"
+    echo "                          hostapd                  [ Clean & Build hostapd          ] "
+    echo "                          wpa_supplicant           [ Clean & Build wpa_supplicant   ] "
+    echo "                          modules                  [ Clean & Build driver modules   ] "
+    echo "                          firmware                 [ Install firmware file          ] "
+    echo "                          scripts                  [ Install scripts                ] "
+    echo "                          utils                    [ Clean & Build scripts          ] "
+    echo "                          iw                       [ Clean & Build iw               ] "
+    echo "                          openssl                  [ Clean & Build openssll         ] "
+    echo "                          libnl                    [ Clean & Build libnl            ] "
+    echo "                          crda                     [ Clean & Build crda             ] "
 
     exit 1
 }
@@ -309,7 +311,7 @@ function build_modules()
 	make defconfig-wl18xx
 	make -j${PROCESSORS_NUMBER}
 	assert_no_error
-	find . -name \*.ko -exec cp {} `path debugging`/ \;
+	#find . -name \*.ko -exec cp {} `path debugging`/ \;
 	find . -name \*.ko -exec ${CROSS_COMPILE}strip -g {} \;
     
 	make  modules_install
@@ -470,8 +472,7 @@ function clean_outputs()
     then
         echo "Cleaning outputs"
         rm -rf `path filesystem`/*
-        rm -f `path outputs`/${tar_filesystem[0]}
-	rm -f `path outputs`/uImage
+        rm -f `path outputs`/*
    fi
 }
 
@@ -698,23 +699,6 @@ function main()
     read_kernel_version
     
 	case "$1" in
-		'update')                
-        print_highlight " setting up workspace and building all "       
-		if [  -n "$2" ]
-        then
-            print_highlight "Using tag $2 " 
-            USE_TAG=$2
-        else
-            print_highlight "Updating all to head (this will revert local changes)" 
-            RESET=1    
-        fi
-        #clean_kernel
-        clean_outputs        
-        setup_workspace
-        read_kernel_version #####read kernel version again after update#####
-        build_all
-		;;
-        
         'init')                
         print_highlight " initializing workspace (w/o build) "       
 		[[  -n "$2" ]] && echo "Using tag $2 " && USE_TAG=$2                
@@ -730,19 +714,32 @@ function main()
         build_all        
 		;;
 
-		'rebuild')
-        print_highlight " building all (w/o clean) "       
-		NO_CLEAN=1 build_all
+        'update')
+        print_highlight " setting up workspace and building all "
+		if [  -n "$2" ]
+        then
+            print_highlight "Using tag $2 "
+            USE_TAG=$2
+        else
+            print_highlight "Updating all to head (this will revert local changes)"
+            RESET=1
+        fi
+        #clean_kernel
+        clean_outputs
+        setup_workspace
+        read_kernel_version #####read kernel version again after update#####
+        build_all
 		;;
         
 		'openlink')
         print_highlight " building all (w/o clean) "       
 		NO_EXTERNAL=1 setup_and_build
 		;;
+
         #################### Building single components #############################
 		'kernel')
 		print_highlight " building only Kernel "
-                clean_kernel
+                #clean_kernel
 		build_uimage
 		;;
 		
@@ -810,11 +807,17 @@ function main()
 		admin_tag $2
 		;;
         
-        *)
+        '')
         print_highlight " building all (No clean & no source code update) "  
 		#clean_outputs
         NO_CLEAN=1 build_all
 		;;
+
+        *)
+        echo " "
+        echo "**** Unknown parameter - please see usage below **** "
+        usage
+        ;;
 	esac
 	
 	[[ -z $NO_BUILD ]] && build_outputs

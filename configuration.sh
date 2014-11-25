@@ -31,8 +31,8 @@ ${PATH__ROOT}/src
 compat_wireless
 ${PATH__ROOT}/src/compat_wireless
 
-debugging
-${PATH__ROOT}/debugging
+#debugging
+#${PATH__ROOT}/debugging
 
 configuration
 ${PATH__ROOT}/configuration
