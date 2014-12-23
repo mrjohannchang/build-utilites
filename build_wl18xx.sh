@@ -362,6 +362,7 @@ function build_wpa_supplicant()
 {
 	cd `repo_path hostap`/wpa_supplicant
 	[ -z $NO_CONFIG ] && cp android.config .config
+    [ -n "$SYSLOG_EN" ] && echo "Enable DEBUG_SYSLOG config" && sed -i "/#CONFIG_DEBUG_SYSLOG=y/ s/# *//" .config
 	CONFIG_LIBNL32=y DESTDIR=`path filesystem` make clean
 	assert_no_error
 	CONFIG_LIBNL32=y DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`repo_path libnl`/include" LIBS+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" LIBS_p+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" make -j${PROCESSORS_NUMBER} CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
