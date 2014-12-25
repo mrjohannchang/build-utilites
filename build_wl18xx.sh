@@ -29,6 +29,7 @@ function usage ()
     echo "                          update       <head|TAG>  [ Update to specific TAG & Build ] "
     echo "                          clean                    [ Clean & Build                  ] "
     echo "                          <empty>                  [ Build w/o update               ] "
+    echo "                          check_updates            [ Check for build script updates ] "
     echo ""
     echo "Building specific component :"
     echo "                          hostapd                  [ Clean & Build hostapd          ] "
@@ -113,6 +114,7 @@ function cd_back()
 
 function check_for_build_updates()
 {
+        git fetch
         count=`git status -uno | grep behind | wc -l`
         if [ $count -ne 0 ]
         then
@@ -286,7 +288,7 @@ function build_uimage()
 	    make -j${PROCESSORS_NUMBER} modules
 	    INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} modules_install
             cp `repo_path kernel`/arch/arm/boot/zImage `path tftp`/zImage
-            cp `repo_path kernel`/arch/arm/boot/dts/*.dtb `path tftp`/
+            cp `repo_path kernel`/arch/arm/boot/dts/am335x-*.dtb `path tftp`/
         else
             LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm 
             cp `repo_path kernel`/arch/arm/boot/uImage.am335x-evm `path tftp`/uImage
@@ -376,7 +378,7 @@ function build_wpa_supplicant()
 }
 
 function build_hostapd()
-{	       
+{
     cd `repo_path hostap`/hostapd
 	[ -z $NO_CONFIG ] && cp android.config .config
 	[ -n "$UPNP_EN" ] && echo "Enable UPNP config" && sed -i "/#CONFIG_WPS_UPNP=y/ s/# *//" .config
@@ -495,7 +497,7 @@ function build_outputs()
             if [ -z $NO_DTB ]
             then
                 cp `path tftp`/zImage `path outputs`/zImage
-                cp `path tftp`/*.dtb `path outputs`/
+                cp `path tftp`/am335x-evm.dtb `path outputs`/am335x-evm.dtb
             else
                 cp `path tftp`/uImage `path outputs`/uImage
             fi
@@ -652,11 +654,38 @@ function verify_skeleton()
 	fi
 }
 
+function verify_installs()
+{
+    apps_to_verify=(
+     libtool
+     python
+     python-m2crypto
+     bison
+     flex
+    )
+
+    i="0"
+	while [ $i -lt ${#apps_to_verify[@]} ]; do
+        if !( hash ${apps_to_verify[i]} 2>/dev/null; )then
+            echo  "${apps_to_verify[i]} is missing"
+            echo  "Please use 'sudo apt-get install ${apps_to_verify[i]}'"
+            read -p "Do you want to install it now [y/n] ? (requires sudo) " yn
+            case $yn in
+                [Yy]* )  sudo apt-get install ${apps_to_verify[i]} ;;
+                [Nn]* ) echo -e "${PURPLE}${apps_to_verify[i]} was not installed. leaving build. ${NORMAL} " ; exit 0 ;;
+                * ) echo "Please answer y or n.";;
+            esac
+        fi
+        i=$[$i + 1]
+    done
+}
+
 function setup_workspace()
 {
 	setup_directories	
 	setup_repositories
 	setup_branches
+    verify_installs
     #Download toolchain only if it was not set
     [ DEFAULT_TOOLCHAIN ] && setup_toolchain   
 }
@@ -696,7 +725,6 @@ function setup_and_build()
 function main()
 {
 	[[ "$1" == "-h" || "$1" == "--help"  ]] && usage
-    check_for_build_updates
     setup_environment
     setup_directories
     read_kernel_version
@@ -809,7 +837,11 @@ function main()
         'admin_tag')        
 		admin_tag $2
 		;;
-        
+
+        'check_updates')
+		check_for_build_updates
+		;;
+
         '')
         print_highlight " building all (No clean & no source code update) "  
 		#clean_outputs
