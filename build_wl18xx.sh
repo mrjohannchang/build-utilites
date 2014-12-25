@@ -281,10 +281,12 @@ function build_uimage()
         then
             make -j${PROCESSORS_NUMBER} zImage
             make -j${PROCESSORS_NUMBER} am335x-evm.dtb
+            make -j${PROCESSORS_NUMBER} am335x-bone.dtb
+            make -j${PROCESSORS_NUMBER} am335x-boneblack.dtb
 	    make -j${PROCESSORS_NUMBER} modules
 	    INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} modules_install
             cp `repo_path kernel`/arch/arm/boot/zImage `path tftp`/zImage
-            cp `repo_path kernel`/arch/arm/boot/dts/am335x-evm.dtb `path tftp`/am335x-evm.dtb
+            cp `repo_path kernel`/arch/arm/boot/dts/*.dtb `path tftp`/
         else
             LOADADDR=0x80008000 make -j${PROCESSORS_NUMBER} uImage.am335x-evm 
             cp `repo_path kernel`/arch/arm/boot/uImage.am335x-evm `path tftp`/uImage
@@ -493,7 +495,7 @@ function build_outputs()
             if [ -z $NO_DTB ]
             then
                 cp `path tftp`/zImage `path outputs`/zImage
-                cp `path tftp`/am335x-evm.dtb `path outputs`/am335x-evm.dtb
+                cp `path tftp`/*.dtb `path outputs`/
             else
                 cp `path tftp`/uImage `path outputs`/uImage
             fi
