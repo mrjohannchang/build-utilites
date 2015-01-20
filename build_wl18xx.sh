@@ -497,7 +497,7 @@ function build_outputs()
             if [ -z $NO_DTB ]
             then
                 cp `path tftp`/zImage `path outputs`/zImage
-                cp `path tftp`/am335x-evm.dtb `path outputs`/am335x-evm.dtb
+                cp `path tftp`/*.dtb `path outputs`/*.dtb
             else
                 cp `path tftp`/uImage `path outputs`/uImage
             fi
@@ -657,8 +657,7 @@ function verify_skeleton()
 function verify_installs()
 {
     apps_to_verify=(
-     libtool
-     python
+     libtool     
      python-m2crypto
      bison
      flex
