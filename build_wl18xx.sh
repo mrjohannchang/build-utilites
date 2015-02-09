@@ -25,7 +25,7 @@ function usage ()
     echo "Usage : "
     echo ""
     echo "Building full package : "
-    echo "        ./wl18xx_build.sh init         <head|TAG>  [ Download and Update w/o build  ] "
+    echo "        ./build_wl18xx.sh init         <head|TAG>  [ Download and Update w/o build  ] "
     echo "                          update       <head|TAG>  [ Update to specific TAG & Build ] "
     echo "                          clean                    [ Clean & Build                  ] "
     echo "                          <empty>                  [ Build w/o update               ] "
@@ -273,7 +273,7 @@ function build_uimage()
 	[ -z $NO_CONFIG ] && cp `path configuration`/kernel_$KERNEL_VERSION.$KERNEL_PATCHLEVEL.config `repo_path kernel`/.config
 	[ -z $NO_CLEAN ] && make clean
 	[ -z $NO_CLEAN ] && assert_no_error
-       
+
     if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
     then
         make -j${PROCESSORS_NUMBER} uImage
@@ -490,18 +490,22 @@ function build_outputs()
         tar cpjf `path outputs`/${tar_filesystem[0]} .
         cd_back
 		
-        if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
-        then
-            cp `path tftp`/uImage `path outputs`/uImage
-        else
-            if [ -z $NO_DTB ]
-            then
-                cp `path tftp`/zImage `path outputs`/zImage
-                cp `path tftp`/*.dtb `path outputs`/*.dtb
-            else
-                cp `path tftp`/uImage `path outputs`/uImage
-            fi
-        fi		
+		# Copy kernel files only if default kernel is used(for now)
+		if [ "$DEFAULT_KERNEL" -eq 1 ]
+		then
+			if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
+			then
+				cp `path tftp`/uImage `path outputs`/uImage
+			else
+				if [ -z $NO_DTB ]
+				then
+					cp `path tftp`/zImage `path outputs`/zImage
+					cp `path tftp`/*.dtb `path outputs`/*.dtb
+				else
+					cp `path tftp`/uImage `path outputs`/uImage
+				fi
+			fi
+		fi
     fi
 }
 
@@ -665,7 +669,7 @@ function verify_installs()
 
     i="0"
 	while [ $i -lt ${#apps_to_verify[@]} ]; do
-        if !( hash ${apps_to_verify[i]} 2>/dev/null; )then
+        if !( dpkg-query -s ${apps_to_verify[i]} 2>/dev/null | grep -q ^"Status: install ok installed"$ )then
             echo  "${apps_to_verify[i]} is missing"
             echo  "Please use 'sudo apt-get install ${apps_to_verify[i]}'"
             read -p "Do you want to install it now [y/n] ? (requires sudo) " yn

@@ -11,7 +11,7 @@
 
 # if DEFAULT toolchain path is set toolchain will be downloaded to ./toolchain.
 export TOOLCHAIN_PATH=DEFAULT
-# if DEAFULT path to root filesystem is set ./fs folder will be used.
+# if DEFAULT path to root filesystem is set ./fs folder will be used.
 export ROOTFS=DEFAULT
 #if DEFAULT kernel path is set - kernel will be downloaded (set branch to match kernel version)
 export KERNEL_PATH=DEFAULT
