@@ -48,11 +48,11 @@ git://git.ti.com/wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
 ti-linux-3.12.y-AMSDK-7
 
 openssl
-https://github.com/openssl/openssl
+git://github.com/openssl/openssl
 OpenSSL_1_0_1g
 
 libnl
-https://github.com/tgraf/libnl.git
+git://github.com/tgraf/libnl.git
 libnl3_2_24
 
 crda
@@ -60,7 +60,7 @@ git://git.ti.com/wilink8-wlan/crda.git
 master
 
 wireless_regdb
-https://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
+git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
 master-2014-10-07
 
 driver
@@ -88,6 +88,6 @@ git://git.ti.com/wilink8-wlan/backports.git
 ap_dfs_mbss_all
 
 iw
-https://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git
+git://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git
 v3.15
 )
