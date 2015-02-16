@@ -188,12 +188,11 @@ function setup_environment()
 	export PROCESSORS_NUMBER=$(egrep '^processor' /proc/cpuinfo | wc -l)
 	export PKG_CONFIG_PATH=`path filesystem`/lib/pkgconfig
 	export INSTALL_PREFIX=`path filesystem`
-	export LIBNL_PATH=`repo_path libnl`	
+	export LIBNL_PATH=`repo_path libnl`
 	export KLIB=`path filesystem`
 	export KLIB_BUILD=${KERNEL_PATH}
-        export GIT_TREE=`repo_path driver`
-        export PATH=$TOOLCHAIN_PATH:$PATH
-    
+    export GIT_TREE=`repo_path driver`
+    export PATH=$TOOLCHAIN_PATH:$PATH
 }
 
 function setup_filesystem_skeleton()
@@ -203,8 +202,8 @@ function setup_filesystem_skeleton()
 	mkdir -p `path filesystem`/usr/lib/crda
 	mkdir -p `path filesystem`/lib/firmware/ti-connectivity
 	mkdir -p `path filesystem`/usr/share/wl18xx
-	mkdir -p `path filesystem`/usr/sbin/wlconf
-	mkdir -p `path filesystem`/usr/sbin/wlconf/official_inis
+	mkdir -p `path filesystem`/usr/bin/wlconf
+	mkdir -p `path filesystem`/usr/bin/wlconf/official_inis
         mkdir -p `path filesystem`/etc/wireless-regdb/pubkeys
 }
 
@@ -427,21 +426,21 @@ function build_wlconf()
 		NFSROOT=`path filesystem` make clean
 		assert_no_error
 		for file_to_copy in $files_to_copy; do
-			rm -f `path filesstem`/usr/sbin/wlconf/$file_to_copy
+			rm -f `path filesstem`/usr/bin/wlconf/$file_to_copy
 		done
-		rm -f `path filesystem`/usr/sbin/wlconf/official_inis/*
+		rm -f `path filesystem`/usr/bin/wlconf/official_inis/*
 	fi
 	NFSROOT=`path filesystem` make CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld
 	assert_no_error
 
 	# install
-	cp -f `repo_path ti_utils`/wlconf/wlconf `path filesystem`/usr/sbin/wlconf
-	chmod 755 `path filesystem`/usr/sbin/wlconf
+	cp -f `repo_path ti_utils`/wlconf/wlconf `path filesystem`/usr/bin/wlconf
+	chmod 755 `path filesystem`/usr/bin/wlconf
 	for file_to_copy in $files_to_copy; do
-		cp $file_to_copy `path filesystem`/usr/sbin/wlconf/$file_to_copy
+		cp $file_to_copy `path filesystem`/usr/bin/wlconf/$file_to_copy
 		echo "echoying files $file_to_copy"
 	done
-	cp official_inis/* `path filesystem`/usr/sbin/wlconf/official_inis/
+	cp official_inis/* `path filesystem`/usr/bin/wlconf/official_inis/
 	cd_back
 }
 
@@ -568,7 +567,7 @@ function set_files_to_verify()
         #`repo_path ti_utils`/calibrator
         #"ELF 32-bit LSB executable, ARM"
 
-        `path filesystem`/usr/sbin/wlconf/wlconf
+        `path filesystem`/usr/bin/wlconf/wlconf
         `repo_path ti_utils`/wlconf/wlconf
         "ELF 32-bit LSB executable, ARM"
         )
