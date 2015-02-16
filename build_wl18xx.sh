@@ -500,7 +500,7 @@ function build_outputs()
 				if [ -z $NO_DTB ]
 				then
 					cp `path tftp`/zImage `path outputs`/zImage
-					cp `path tftp`/*.dtb `path outputs`/*.dtb
+					cp `path tftp`/*.dtb `path outputs`/
 				else
 					cp `path tftp`/uImage `path outputs`/uImage
 				fi
