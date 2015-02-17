@@ -429,7 +429,7 @@ function build_wlconf()
 		NFSROOT=`path filesystem` make clean
 		assert_no_error
 		for file_to_copy in $files_to_copy; do
-			rm -f `path filesstem`/usr/sbin/wlconf/$file_to_copy
+			rm -f `path filesystem`/usr/sbin/wlconf/$file_to_copy
 		done
 		rm -f `path filesystem`/usr/sbin/wlconf/official_inis/*
 	fi
@@ -458,10 +458,10 @@ function build_scripts_download()
 	cd_repo scripts_download
 	echo "Copying scripts"
 	scripts_download_path=`repo_path scripts_download`
-	for script_dir in `ls $scripts_download_path`
+	for script_dir in `ls -d $scripts_download_path`/*/
 	do
 		echo "Copying everything from ${script_dir} to `path filesystem`/usr/share/wl18xx directory"
-		cp -rf `repo_path scripts_download`/${script_dir}/* `path filesystem`/usr/share/wl18xx
+		cp -rf ${script_dir}/* `path filesystem`/usr/share/wl18xx
 	done
 	cd_back
 }
