@@ -418,6 +418,7 @@ function build_calibrator()
 	assert_no_error
 	NFSROOT=`path filesystem` make install
 	#assert_no_error
+	cp -f `repo_path ti_utils`/hw/firmware/wl1271-nvs.bin `path filesystem`/lib/firmware/ti-connectivity
 	cd_back
 }
 
