@@ -397,7 +397,7 @@ function build_hostapd()
 function build_crda()
 {	
 	cp `repo_path wireless_regdb`/regulatory.bin `path filesystem`/usr/lib/crda/regulatory.bin
-	cp `repo_path wireless_regdb`/linville.key.pub.pem `path filesystem`/etc/wireless-regdb/pubkeys/
+	cp `repo_path wireless_regdb`/sforshee.key.pub.pem `path filesystem`/etc/wireless-regdb/pubkeys/
     cd_repo crda
 	
 	[ -z $NO_CLEAN ] && DESTDIR=`path filesystem` make clean
@@ -656,7 +656,9 @@ function verify_skeleton()
 	which regdbdump > /dev/null
 	if [ $? -eq 0 ]; then
 		regdbdump `path filesystem`/usr/lib/crda/regulatory.bin > /dev/null
-		assert_no_error
+		if [ $? -ne 0 ]; then
+       			echo "Please update your public key used to verify the DB"
+       		fi
 	fi
 }
 
