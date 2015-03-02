@@ -148,8 +148,7 @@ function read_kernel_version()
             KERNEL_SUBLEVEL=$(echo $sublevel|sed 's/[^0-9]//g')
             echo "Makefile was found. Kernel version was set to $KERNEL_VERSION.$KERNEL_PATCHLEVEL.$KERNEL_SUBLEVEL." 
         fi
-
-	./verify_kernel_config.sh $KERNEL_PATH/.config
+	[ $VERIFY_CONFIG ] && ./verify_kernel_config.sh $KERNEL_PATH/.config
 }
 
 #----------------------------------------------------------j
