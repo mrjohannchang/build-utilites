@@ -42,7 +42,9 @@ function usage ()
     echo "                          openssl                  [ Clean & Build openssll         ] "
     echo "                          libnl                    [ Clean & Build libnl            ] "
     echo "                          crda                     [ Clean & Build crda             ] "
-
+    echo "                          patch_kernel             [ Apply provided kernel patches  ] "
+    echo "                          uim                      [ Clean & Build uim              ] "
+    echo "                          bt-firmware              [ Install Bluetooth init scripts ] "
     exit 1
 }
 
@@ -201,6 +203,8 @@ function setup_filesystem_skeleton()
 {
 	mkdir -p `path filesystem`/usr/bin
 	mkdir -p `path filesystem`/etc
+	mkdir -p `path filesystem`/etc/init.d
+	mkdir -p `path filesystem`/etc/rcS.d
 	mkdir -p `path filesystem`/usr/lib/crda
 	mkdir -p `path filesystem`/lib/firmware/ti-connectivity
 	mkdir -p `path filesystem`/usr/share/wl18xx
@@ -310,6 +314,13 @@ function build_modules()
 {
 	generate_compat
 	cd_repo compat_wireless
+	if [ -d "$PATH__ROOT/patches/driver_patches/$KERNEL_VARIANT" ]; then
+		for i in $PATH__ROOT/patches/driver_patches/$KERNEL_VARIANT/*.patch; do
+			print_highlight "Applying driver patch: $i"
+			patch -p1 < $i;
+			assert_no_error
+		done
+	fi
 	if [ -z $NO_CLEAN ]; then
 		make clean
 	fi
@@ -452,6 +463,54 @@ function build_fw_download()
 	cp `repo_path fw_download`/*.bin `path filesystem`/lib/firmware/ti-connectivity
 }
 
+function patch_kernel()
+{
+	[ ! -d $KERNEL_PATH ] && echo "Error KERNEL_PATH: $KERNEL_PATH dir does not exist" && exit 1
+	cd $KERNEL_PATH
+	echo "using kernel: $KERNEL_PATH"
+	if [ -d "$PATH__ROOT/patches/kernel_patches/$KERNEL_VARIANT" ]; then
+		read -p "Branch name to use? (will be created if doesn't exist)" -e branchname
+		if git show-ref --verify --quiet "refs/heads/$branchname"; then
+			echo "Branch name $branchname already exists, trying to use it..."
+			git checkout $branchname
+		else
+			echo "Creating branch $branchname and switching to it"
+			git checkout -b $branchname
+		fi
+		assert_no_error
+		for i in $PATH__ROOT/patches/kernel_patches/$KERNEL_VARIANT/*.patch; do
+			git am $i;
+			assert_no_error
+		done
+	fi
+	assert_no_error
+	cd_back
+}
+
+function build_uim()
+{
+	cd_repo uim
+	[ -z $NO_CLEAN ] && NFSROOT=`path filesystem` make clean
+	[ -z $NO_CLEAN ] && assert_no_error
+	make CC=${CROSS_COMPILE}gcc
+	assert_no_error
+        install -m 0755 uim `path filesystem`/usr/bin
+	install -m 0755 `repo_path uim`/scripts/uim-sysfs `path filesystem`/etc/init.d/
+	cd `path filesystem`/etc/rcS.d/
+	ln -sf  ../init.d/uim-sysfs S03uim-sysfs
+	assert_no_error
+	cd_back
+}
+
+function build_bt_firmware()
+{
+	cd_repo bt-firmware
+	for i in `repo_path bt-firmware`/*.bts; do
+		echo "Installing bluetooth init script: $i"
+		install -m 0755 $i `path filesystem`/lib/firmware/
+		assert_no_error
+	done
+}
 
 function build_scripts_download()
 {
@@ -493,7 +552,7 @@ function build_outputs()
         cd_back
 		
 		# Copy kernel files only if default kernel is used(for now)
-		if [ "$DEFAULT_KERNEL" -eq 1 ]
+		if [[ "$KERNEL_PATH" == "DEFAULT" ]]
 		then
 			if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
 			then
@@ -718,6 +777,8 @@ function build_all()
         build_wlconf
         build_fw_download
         build_scripts_download
+        build_uim
+        build_bt_firmware
     fi
     
     [ -z $NO_VERIFY ] && verify_skeleton
@@ -802,7 +863,7 @@ function main()
 		;;
 
 		'crda')
-        print_highlight " building only CRDA "
+		print_highlight " building only CRDA "
 		build_crda
 		;;
         
@@ -825,16 +886,33 @@ function main()
 		print_highlight " Copying scripts "
 		build_scripts_download
 		;;
-		
+
 		'utils')
 		print_highlight " building only ti-utils "
 		build_calibrator
 		build_wlconf		
-		;;        
+		;;
+
 		'firmware')
-                print_highlight " building only firmware"
-                build_fw_download
-                ;;
+		print_highlight " building only firmware"
+		build_fw_download
+		;;
+
+		'patch_kernel')
+		print_highlight " only patching kernel $2 without performing an actual build!"
+		NO_BUILD=1
+		patch_kernel
+		;;
+
+		'uim')
+		print_highlight " building only uim "
+		build_uim
+		;;
+
+		'bt-firmware')
+		print_highlight " Only installing bluetooth init scripts "
+		build_bt_firmware
+		;;
         ############################################################
         'get_tag')
         get_tag

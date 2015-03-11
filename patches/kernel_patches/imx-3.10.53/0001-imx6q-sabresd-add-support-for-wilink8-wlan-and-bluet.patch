@@ -1,0 +1,126 @@
+From e53032e6ab7e3498e8d9f6539a96f3cda6f35aa8 Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Wed, 4 Mar 2015 14:08:59 +0200
+Subject: [PATCH 1/7] imx6q-sabresd: add support for wilink8 wlan and
+ bluetooth
+
+* enable uart5 used for bluetooth with wilink8 with flow control
+* configure SD2 to be used for sdio communication to wilink8 wlan
+* configure gpios used for wlan/bt enables and wlan_irq
+* setup voltage regulator used for wl8 wlan power control
+* disable SPI1 as it pins are routed to J13 for connecting to wilink8
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ arch/arm/boot/dts/imx6qdl-sabresd.dtsi |   56 ++++++++++++++++++++++++++++++--
+ 1 file changed, 53 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-sabresd.dtsi b/arch/arm/boot/dts/imx6qdl-sabresd.dtsi
+index b5394f3..57b468a 100644
+--- a/arch/arm/boot/dts/imx6qdl-sabresd.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-sabresd.dtsi
+@@ -22,6 +22,32 @@
+ 		reg = <0x10000000 0x40000000>;
+ 	};
+ 
++	wlan_en_reg: fixedregulator@2 {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++
++		/* WLAN_EN GPIO for this board – Bank4, pin7 */
++		gpio = <&gpio4 7 0>;
++
++		/* WLAN card specific delay */
++		startup-delay-us = <70000>;
++		enable-active-high;
++	};
++
++        kim {
++                compatible = "kim";
++                nshutdown_gpio = <2>;  /* GPIO_2 */
++                dev_name = "/dev/ttymxc4";
++                flow_cntrl = <1>;
++                baud_rate = <3000000>;
++        };
++
++        btwilink {
++                compatible = "btwilink";
++        };
++
+ 	battery: max8903@0 {
+ 		compatible = "fsl,max8903-charger";
+ 		pinctrl-names = "default";
+@@ -253,6 +279,7 @@
+ 	pu-supply = <&pu_dummy>; /* use pu_dummy if VDDSOC share with VDDPU */
+ };
+ 
++/* the spi pins (inctrl_ecspi1_2) are used for connecting to WL8 using J13 so we disable it
+ &ecspi1 {
+ 	fsl,spi-num-chipselects = <1>;
+ 	cs-gpios = <&gpio4 9 0>;
+@@ -268,6 +295,7 @@
+ 		reg = <0>;
+ 	};
+ };
++*/
+ 
+ &fec {
+ 	pinctrl-names = "default";
+@@ -506,6 +534,8 @@
+ 				MX6QDL_PAD_GPIO_1__WDOG2_B 0x80000000
+ 				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x80000000
+ 				MX6QDL_PAD_SD1_CMD__GPIO1_IO18 0x80000000
++				MX6QDL_PAD_KEY_ROW0__GPIO4_IO07 0x13059 // reserve two pins wl8 gpio, this is pulled low at reset for WL_EN
++				MX6QDL_PAD_KEY_COL0__GPIO4_IO06 0x13059 // this is for WL_IRQ which driver will configure as an input with a pull down
+ 			>;
+ 		};
+ 	};
+@@ -611,6 +641,15 @@
+ 	status = "okay";
+ };
+ 
++&uart5 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart5_1>;
++	status = "okay";
++
++	/* enable rts/cts usage on uart5 */
++	fsl,uart-has-rtscts;
++};
++
+ &usbh1 {
+ 	vbus-supply = <&reg_usb_h1_vbus>;
+ 	status = "okay";
+@@ -626,13 +665,24 @@
+ 
+ &usdhc2 {
+ 	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_usdhc2_1>;
+-	cd-gpios = <&gpio2 2 0>;
+-	wp-gpios = <&gpio2 3 0>;
++	pinctrl-0 = <&pinctrl_usdhc2_2>;
+ 	no-1-8-v;
+ 	keep-power-in-suspend;
+ 	enable-sdio-wakeup;
++	vmmc-supply = <&wlan_en_reg>;
++	non-removable;    /* non-removable is not a variable, the fact it is */
++	                  /* listed is all that is used by driver  */
++	cap-power-off-card;
+ 	status = "okay";
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@0 {
++		compatible = "ti,wlcore";
++		reg = <2>;
++		interrupt-parent = <&gpio4>;
++		interrupts = <6 0>;
++		platform-quirks = <1>;
++	};
+ };
+ 
+ &usdhc3 {
+-- 
+1.7.9.5
+

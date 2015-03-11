@@ -11,10 +11,22 @@
 
 # if DEFAULT toolchain path is set toolchain will be downloaded to ./toolchain.
 export TOOLCHAIN_PATH=DEFAULT
+
 # if DEFAULT path to root filesystem is set ./fs folder will be used.
 export ROOTFS=DEFAULT
+
 #if DEFAULT kernel path is set - kernel will be downloaded (set branch to match kernel version)
 export KERNEL_PATH=DEFAULT
+
+# if KERNEL_VARIANT below is set the build script will look for kernel specific
+# patches under the patches directory:
+# - patches under the pathces/driver_patches/$KERNEL_VARIANT directory would be
+#   applied during "modules" build.
+# - patches under the patches/kernel_patches/$/$KERNEL_VARIANT directory would
+#   be applied to the kernel pointed by KERNEL_PATH in case the "patch_kernel"
+#   command is used.
+#   Note: the kernel is not built automatically after the patches are applied
+export KERNEL_VARIANT=DEFAULT
 
 export CROSS_COMPILE=arm-linux-gnueabihf-
 export ARCH=arm

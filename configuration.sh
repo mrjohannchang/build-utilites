@@ -90,4 +90,12 @@ ap_dfs_mbss_all
 iw
 git://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git
 v3.15
+
+uim
+git://git.ti.com/ti-bt/uim.git
+master
+
+bt-firmware
+git://git.ti.com/ti-bt/service-packs.git
+master
 )
