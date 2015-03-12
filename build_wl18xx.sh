@@ -314,7 +314,7 @@ function build_modules()
 {
 	generate_compat
 	cd_repo compat_wireless
-	if [ -d "$PATH__ROOT/patches/driver_patches/$KERNEL_VARIANT" ]; then
+	if [ -n "$KERNEL_VARIANT" ] && [ -d "$PATH__ROOT/patches/driver_patches/$KERNEL_VARIANT" ]; then
 		for i in $PATH__ROOT/patches/driver_patches/$KERNEL_VARIANT/*.patch; do
 			print_highlight "Applying driver patch: $i"
 			patch -p1 < $i;
