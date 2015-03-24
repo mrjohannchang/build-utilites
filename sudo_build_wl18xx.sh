@@ -19,8 +19,10 @@ sudoregex[2]="tar "
 sudoregex[3]="cp "
 sudoregex[4]="chmod "
 sudoregex[5]="rm "
+sudoregex[6]="install -m "
+sudoregex[7]="ln "
 
-for i in {1..5}
+for i in {1..7}
 do
     #echo "Add 'sudo' for $i) ${sudoregex[$i]}"
     #sed -i "s/${sudoregex[$i]}/${SUDO_PREFIX} /" ./$SUDO_FILENAME
