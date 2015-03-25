@@ -546,13 +546,13 @@ function build_outputs()
 {
 	if [[ "$ROOTFS" == "DEFAULT" ]]
     then  
-        echo "Building outputs"    
+        echo "Building outputs"
         cd_path filesystem
         tar cpjf `path outputs`/${tar_filesystem[0]} .
         cd_back
 		
 		# Copy kernel files only if default kernel is used(for now)
-		if [[ "$KERNEL_PATH" == "DEFAULT" ]]
+		if [[ $DEFAULT_KERNEL -eq 1 ]]
 		then
 			if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
 			then
