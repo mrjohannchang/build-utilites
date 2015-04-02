@@ -546,13 +546,13 @@ function build_outputs()
 {
 	if [[ "$ROOTFS" == "DEFAULT" ]]
     then  
-        echo "Building outputs"    
+        echo "Building outputs"
         cd_path filesystem
         tar cpjf `path outputs`/${tar_filesystem[0]} .
         cd_back
 		
 		# Copy kernel files only if default kernel is used(for now)
-		if [[ "$KERNEL_PATH" == "DEFAULT" ]]
+		if [[ $DEFAULT_KERNEL -eq 1 ]]
 		then
 			if [ "$KERNEL_VERSION" -eq 3 ] && [ "$KERNEL_PATCHLEVEL" -eq 2 ]
 			then
@@ -599,15 +599,15 @@ function set_files_to_verify()
 
         `path filesystem`/usr/local/sbin/wpa_supplicant
         `repo_path hostap`/wpa_supplicant/wpa_supplicant
-        "ELF 32-bit LSB executable, ARM"
+        "ELF 32-bit LSB[ ]*executable, ARM"
 
         `path filesystem`/usr/local/bin/hostapd
         `repo_path hostap`/hostapd/hostapd
-        "ELF 32-bit LSB executable, ARM"
+        "ELF 32-bit LSB[ ]*executable, ARM"
 
         `path filesystem`/sbin/crda
         `repo_path crda`/crda
-        "ELF 32-bit LSB executable, ARM"
+        "ELF 32-bit LSB[ ]*executable, ARM"
 
         `path filesystem`/usr/lib/crda/regulatory.bin
         `repo_path wireless_regdb`/regulatory.bin
@@ -619,19 +619,19 @@ function set_files_to_verify()
 
         `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/updates/drivers/net/wireless/ti/wl18xx/wl18xx.ko
         `path compat_wireless`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
-        "ELF 32-bit LSB relocatable, ARM"
+        "ELF 32-bit LSB[ ]*relocatable, ARM"
 
         `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/updates/drivers/net/wireless/ti/wlcore/wlcore.ko
         `path compat_wireless`/drivers/net/wireless/ti/wlcore/wlcore.ko
-        "ELF 32-bit LSB relocatable, ARM"
+        "ELF 32-bit LSB[ ]*relocatable, ARM"
 
         #`path filesystem`/usr/bin/calibrator
         #`repo_path ti_utils`/calibrator
-        #"ELF 32-bit LSB executable, ARM"
+        #"ELF 32-bit LSB[ ]*executable, ARM"
 
         `path filesystem`/usr/sbin/wlconf/wlconf
         `repo_path ti_utils`/wlconf/wlconf
-        "ELF 32-bit LSB executable, ARM"
+        "ELF 32-bit LSB[ ]*executable, ARM"
         )
 }
 
