@@ -942,5 +942,6 @@ function main()
 	
 	[[ -z $NO_BUILD ]] && build_outputs
 	[[ -n $INSTALL_NFS ]] && install_outputs
+	echo "Wifi Package Build Successful"
 }
 main $@
