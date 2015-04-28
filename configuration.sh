@@ -60,8 +60,8 @@ git://git.ti.com/wilink8-wlan/crda.git
 master
 
 wireless_regdb
-git://git.kernel.org/pub/scm/linux/kernel/git/linville/wireless-regdb.git
-master-2014-10-07
+git://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git
+master-2015-04-06
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
