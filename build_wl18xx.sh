@@ -407,7 +407,7 @@ function build_hostapd()
 function build_crda()
 {	
 	cp `repo_path wireless_regdb`/regulatory.bin `path filesystem`/usr/lib/crda/regulatory.bin
-	cp `repo_path wireless_regdb`/sforshee.key.pub.pem `path filesystem`/etc/wireless-regdb/pubkeys/
+	cp `repo_path crda`/pubkeys/* `path filesystem`/etc/wireless-regdb/pubkeys/
     cd_repo crda
 	
 	[ -z $NO_CLEAN ] && DESTDIR=`path filesystem` make clean
