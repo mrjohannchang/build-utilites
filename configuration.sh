@@ -45,7 +45,7 @@ repositories=(
 
 kernel
 git://git.ti.com/wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
-ti-linux-3.12.y-AMSDK-7
+sitara-ti-linux-3.14.y-wlcore
 
 openssl
 git://github.com/openssl/openssl
@@ -61,15 +61,15 @@ master
 
 wireless_regdb
 git://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git
-master-2015-04-06
+master-2015-05-15
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
-ap_p2p
+upstream_41
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
-ap_p2p
+upstream_24
 
 ti_utils
 git://git.ti.com/wilink8-wlan/18xx-ti-utils.git
@@ -81,11 +81,11 @@ ap_dfs
 
 scripts_download
 git://git.ti.com/wilink8-wlan/wl18xx-target-scripts.git
-sitara-mbss
+sitara-scripts
 
 backports
 git://git.ti.com/wilink8-wlan/backports.git
-ap_dfs_mbss_all
+upstream_41
 
 iw
 git://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git
