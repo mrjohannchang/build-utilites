@@ -505,7 +505,7 @@ function build_uim()
 function build_bt_firmware()
 {
 	cd_repo bt-firmware
-	for i in `repo_path bt-firmware`/*.bts; do
+	for i in `repo_path bt-firmware`/initscripts/*.bts; do
 		echo "Installing bluetooth init script: $i"
 		install -m 0755 $i `path filesystem`/lib/firmware/
 		assert_no_error
