@@ -393,7 +393,7 @@ function build_hostapd()
 {
     cd `repo_path hostap`/hostapd
 	[ -z $NO_CONFIG ] && cp android.config .config
-	[ -n "$UPNP_EN" ] && echo "Enable UPNP config" && sed -i "/#CONFIG_WPS_UPNP=y/ s/# *//" .config
+	[ -z $NO_UPNP ] && echo "Enable UPNP config" && sed -i "/#CONFIG_WPS_UPNP=y/ s/# *//" .config
 	CONFIG_LIBNL32=y DESTDIR=`path filesystem` make clean
 	assert_no_error
 	CONFIG_LIBNL32=y DESTDIR=`path filesystem` CFLAGS+="-I`path filesystem`/usr/local/ssl/include -I`repo_path libnl`/include" LIBS+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" LIBS_p+="-L`path filesystem`/lib -L`path filesystem`/usr/local/ssl/lib -lssl -lcrypto -lm -ldl -lpthread" make -j${PROCESSORS_NUMBER} CC=${CROSS_COMPILE}gcc LD=${CROSS_COMPILE}ld AR=${CROSS_COMPILE}ar
