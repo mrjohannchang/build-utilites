@@ -272,6 +272,28 @@ function setup_toolchain()
 	fi
 }
 
+function build_intree()
+{
+    cd_repo driver
+	export KERNEL_PATH=`repo_path driver`
+	read_kernel_version
+	[ $CONFIG ] && cp `path configuration`/kernel_$KERNEL_VERSION.$KERNEL_PATCHLEVEL.config `repo_path driver`/.config
+	[ $CLEAN ] && make clean
+	[ $CLEAN ] && assert_no_error
+
+	make -j${PROCESSORS_NUMBER} zImage
+	make -j${PROCESSORS_NUMBER} am335x-evm.dtb
+	make -j${PROCESSORS_NUMBER} am335x-bone.dtb
+	make -j${PROCESSORS_NUMBER} am335x-boneblack.dtb
+	make -j${PROCESSORS_NUMBER} modules
+	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} modules_install
+	cp `repo_path driver`/arch/arm/boot/zImage `path tftp`/zImage
+	cp `repo_path driver`/arch/arm/boot/dts/am335x-*.dtb `path tftp`/
+
+	assert_no_error
+	cd_back
+}
+
 function build_uimage()
 {
     cd_repo kernel
@@ -841,12 +863,19 @@ function main()
                 #clean_kernel
 		build_uimage
 		;;
+
+		'intree')
+		print_highlight " building modules intree"
+                #clean_kernel
+		build_intree
+		;;
 		
-                'kernel_modules')
-        print_highlight " building only Driver modules "
-                build_uimage
+        'kernel_modules')
+        print_highlight " building kernel and driver modules"
+        build_uimage
 		build_modules
-                ;;
+		;;
+
 		'modules')
         print_highlight " building only Driver modules "
 		build_modules
