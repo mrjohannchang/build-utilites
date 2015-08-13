@@ -1,7 +1,7 @@
-From fe548307100be21e83157e61d1dd55ffef4029bb Mon Sep 17 00:00:00 2001
+From 3f7c2a040fe4d757705a4047ee9b4e41ed09fdde Mon Sep 17 00:00:00 2001
 From: Eyal Reizer <eyalr@ti.com>
 Date: Wed, 4 Mar 2015 14:13:15 +0200
-Subject: [PATCH 3/7] imx_v7_defconfig: enable Wilink8 related switches
+Subject: [PATCH 03/12] imx_v7_defconfig: enable Wilink8 related switches
 
 * Disable internal mac80211 and cfg80211 as we are building wilink8
   drivers using backport and loading as modules

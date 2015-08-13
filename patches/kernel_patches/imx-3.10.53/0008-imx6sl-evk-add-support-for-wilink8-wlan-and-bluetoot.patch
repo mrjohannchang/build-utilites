@@ -1,7 +1,7 @@
-From 92adbbd7e6082277eb1865a7b8b3c24a8cab8fe3 Mon Sep 17 00:00:00 2001
+From e05052a1ef78b91a5f801f8f73df1a81ee42c9bd Mon Sep 17 00:00:00 2001
 From: Eyal Reizer <eyalr@ti.com>
 Date: Mon, 23 Mar 2015 13:14:06 +0200
-Subject: [PATCH] imx6sl-evk: add support for wilink8 wlan and bluetooth
+Subject: [PATCH 08/12] imx6sl-evk: add support for wilink8 wlan and bluetooth
 
 * enable uart4 used for bluetooth with wilink8 with flow control
 * configure SD3 to be used for sdio communication to wilink8 wlan

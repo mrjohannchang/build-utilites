@@ -1,7 +1,7 @@
-From e53032e6ab7e3498e8d9f6539a96f3cda6f35aa8 Mon Sep 17 00:00:00 2001
+From efde6f3653bd70a9cd92bfdf882ffc3fa2fbf442 Mon Sep 17 00:00:00 2001
 From: Eyal Reizer <eyalr@ti.com>
 Date: Wed, 4 Mar 2015 14:08:59 +0200
-Subject: [PATCH 1/7] imx6q-sabresd: add support for wilink8 wlan and
+Subject: [PATCH 01/12] imx6q-sabresd: add support for wilink8 wlan and
  bluetooth
 
 * enable uart5 used for bluetooth with wilink8 with flow control

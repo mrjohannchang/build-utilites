@@ -1,7 +1,7 @@
-From 3bc3ac098de1c999020e40601d2db99ae5e1b2f0 Mon Sep 17 00:00:00 2001
+From 7323198b3c5cb19d22eff545c1b324a5e3e5efac Mon Sep 17 00:00:00 2001
 From: Eyal Reizer <eyalr@ti.com>
 Date: Wed, 29 Jan 2014 09:24:06 +0200
-Subject: [PATCH 4/7] st_kim: do not use debugfs functions if not enabled
+Subject: [PATCH 04/12] st_kim: do not use debugfs functions if not enabled
 
 the probe function was using debugfs apis without checking if
 CONFIG_DEBUG_FS was enabled resulting with runtime errors.

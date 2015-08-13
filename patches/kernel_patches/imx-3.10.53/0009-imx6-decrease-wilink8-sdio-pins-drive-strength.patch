@@ -1,7 +1,7 @@
-From 3f1b360d3954c688eb1f2e0e51d59b60006c4163 Mon Sep 17 00:00:00 2001
+From 585c064b1220a89194a1b76a339ed80eb291c231 Mon Sep 17 00:00:00 2001
 From: Eyal Reizer <eyalr@ti.com>
 Date: Thu, 2 Apr 2015 14:47:15 +0300
-Subject: [PATCH] imx6: decrease wilink8 sdio pins drive strength
+Subject: [PATCH 09/12] imx6: decrease wilink8 sdio pins drive strength
 
 The original drive strength value of 90 OHM was too strong causing
 detection issues of some modules on the sdio bus.

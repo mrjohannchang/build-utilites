@@ -1,7 +1,7 @@
-From c55f8870f94fef8a588358e4e2ff6eb368eb21bd Mon Sep 17 00:00:00 2001
+From fcce881cb85ca283e142b624133893c5b714433f Mon Sep 17 00:00:00 2001
 From: Pavan Savoy <pavan_savoy@ti.com>
 Date: Mon, 15 Oct 2012 17:47:35 -0500
-Subject: [PATCH 2/7] Bluetooth: Add tty HCI driver
+Subject: [PATCH 02/12] Bluetooth: Add tty HCI driver
 
 tty_hci driver exposes a /dev/hci_tty character device node, that intends to
 emulate a generic /dev/ttyX device that would be used by the user-space

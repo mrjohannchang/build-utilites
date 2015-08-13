@@ -1,7 +1,7 @@
-From 9f77068002ef057a1e01496f612853a6b35dde00 Mon Sep 17 00:00:00 2001
+From c66808006cecb73fb66335a0ccb9f5a6748054cd Mon Sep 17 00:00:00 2001
 From: Eyal Reizer <eyalr@ti.com>
 Date: Wed, 29 Jan 2014 09:03:41 +0200
-Subject: [PATCH 5/7] st_kim: allow suspend if callback is not registered
+Subject: [PATCH 05/12] st_kim: allow suspend if callback is not registered
 
 Suspend/resume was failing if callbacks were not registered.
 As it is ok not to do anything when suspending fix this
