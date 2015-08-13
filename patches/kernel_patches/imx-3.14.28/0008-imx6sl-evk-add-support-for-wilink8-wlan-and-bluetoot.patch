@@ -1,0 +1,180 @@
+From 43e6228120a2c4448e580a2a3e2bc986b2dabd71 Mon Sep 17 00:00:00 2001
+From: Alexey Berd <alexeyb@ti.com>
+Date: Thu, 11 Jun 2015 11:07:42 +0100
+Subject: [PATCH 08/10] imx6sl-evk: add support for wilink8 wlan and bluetooth
+
+* enable uart4 used for bluetooth with wilink8 with flow control
+* configure SD3 to be used for sdio communication to wilink8 wlan
+* configure gpios used for wlan/bt enables and wlan_irq
+* setup voltage regulator used for wl8 wlan power control
+* disable SD1 as it pins are used for BT/WLAN EN, IRQ, BT UART
+
+Signed-off-by: Alexey Berd <alexeyb@ti.com>
+ [Adapted for imx 3.14.26 kernel and R8.6]
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ arch/arm/boot/dts/imx6sl-evk.dts |  102 +++++++++++++++++++-------------------
+ 1 file changed, 50 insertions(+), 52 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6sl-evk.dts b/arch/arm/boot/dts/imx6sl-evk.dts
+index e233a5c..5c829c3 100644
+--- a/arch/arm/boot/dts/imx6sl-evk.dts
++++ b/arch/arm/boot/dts/imx6sl-evk.dts
+@@ -9,6 +9,7 @@
+ /dts-v1/;
+ 
+ #include <dt-bindings/input/input.h>
++#include <dt-bindings/interrupt-controller/irq.h>
+ #include "imx6sl.dtsi"
+ 
+ / {
+@@ -32,6 +33,28 @@
+ 		reg = <0x80000000 0x40000000>;
+ 	};
+ 
++	wlan_en_reg: fixedregulator@2 {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		/* WLAN_EN GPIO for this board - Bank5, pin13 */
++		gpio = <&gpio5 13 0>;
++		enable-active-high;
++	};
++
++	kim {
++	        compatible = "kim";
++	        nshutdown_gpio = <134>;  // GPIO5_6 The wl8 driver expects gpio to be an integer, so gpio5_6 is (5-1)*32+6=134
++	        dev_name = "/dev/ttymxc3";
++	        flow_cntrl = <1>;
++	        baud_rate = <3000000>;
++	};
++
++	btwilink {
++	        compatible = "btwilink";
++	};
++
+ 	regulators {
+ 		compatible = "simple-bus";
+ 		#address-cells = <1>;
+@@ -656,21 +679,13 @@
+ 
+ 		pinctrl_uart4_1: uart4grp-1 {
+ 			fsl,pins = <
+-				MX6SL_PAD_SD1_DAT4__UART4_RX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT5__UART4_TX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT7__UART4_CTS_B		0x1b0b1
+-				MX6SL_PAD_SD1_DAT6__UART4_RTS_B		0x1b0b1
++				MX6SL_PAD_SD1_DAT4__UART4_RX_DATA 0x13059 // used for HOST_HCI_RX
++				MX6SL_PAD_SD1_DAT5__UART4_TX_DATA 0x13059 // used for HOST_HCI_TX
++				MX6SL_PAD_SD1_DAT7__UART4_CTS_B 0x13059   // used for HOST_HCI_RTS, note reversed to TI nomenclature
++				MX6SL_PAD_SD1_DAT6__UART4_RTS_B 0x13059   // used for HOST_HCI_CTS
+ 			>;
+ 		};
+ 
+-		pinctrl_uart4dte_1: uart4dtegrp-1 {
+-			fsl,pins = <
+-				MX6SL_PAD_SD1_DAT5__UART4_RX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT4__UART4_TX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT6__UART4_CTS_B		0x1b0b1
+-				MX6SL_PAD_SD1_DAT7__UART4_RTS_B		0x1b0b1
+-			>;
+-		};
+ 
+ 		pinctrl_usbotg1: usbotg1grp {
+ 			fsl,pins = <
+@@ -764,28 +779,8 @@
+ 				MX6SL_PAD_SD3_DAT1__SD3_DATA1		0x17059
+ 				MX6SL_PAD_SD3_DAT2__SD3_DATA2		0x17059
+ 				MX6SL_PAD_SD3_DAT3__SD3_DATA3		0x17059
+-			>;
+-		};
+-
+-		pinctrl_usdhc3_100mhz: usdhc3grp100mhz {
+-			fsl,pins = <
+-				MX6SL_PAD_SD3_CMD__SD3_CMD		0x170b9
+-				MX6SL_PAD_SD3_CLK__SD3_CLK		0x100b9
+-				MX6SL_PAD_SD3_DAT0__SD3_DATA0		0x170b9
+-				MX6SL_PAD_SD3_DAT1__SD3_DATA1		0x170b9
+-				MX6SL_PAD_SD3_DAT2__SD3_DATA2		0x170b9
+-				MX6SL_PAD_SD3_DAT3__SD3_DATA3		0x170b9
+-			>;
+-		};
+-
+-		pinctrl_usdhc3_200mhz: usdhc3grp200mhz {
+-			fsl,pins = <
+-				MX6SL_PAD_SD3_CMD__SD3_CMD		0x170f9
+-				MX6SL_PAD_SD3_CLK__SD3_CLK		0x100f9
+-				MX6SL_PAD_SD3_DAT0__SD3_DATA0		0x170f9
+-				MX6SL_PAD_SD3_DAT1__SD3_DATA1		0x170f9
+-				MX6SL_PAD_SD3_DAT2__SD3_DATA2		0x170f9
+-				MX6SL_PAD_SD3_DAT3__SD3_DATA3		0x170f9
++				MX6SL_PAD_SD1_DAT2__GPIO5_IO13  0x13059   // reserve two pins from sd1 for wl8 gpio, this is pulled low at reset for WL_EN
++				MX6SL_PAD_SD1_DAT1__GPIO5_IO08  0x13059   // this is for wl_irq which driver will configure as an input with a pull down
+ 			>;
+ 		};
+ 
+@@ -896,6 +891,13 @@
+ 	status = "okay";
+ };
+ 
++&uart4 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart4_1>;
++	status = "okay";
++	fsl,uart-has-rtscts;      // enable rts/cts usage on uart4
++};
++
+ &usbotg1 {
+ 	vbus-supply = <&reg_usb_otg1_vbus>;
+ 	pinctrl-names = "default";
+@@ -911,18 +913,6 @@
+ 	status = "okay";
+ };
+ 
+-&usdhc1 {
+-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+-	pinctrl-0 = <&pinctrl_usdhc1>;
+-	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+-	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+-	bus-width = <8>;
+-	cd-gpios = <&gpio4 7 0>;
+-	wp-gpios = <&gpio4 6 0>;
+-	keep-power-in-suspend;
+-	enable-sdio-wakeup;
+-	status = "okay";
+-};
+ 
+ &usdhc2 {
+ 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+@@ -936,13 +926,21 @@
+ 	status = "okay";
+ };
+ 
+-&usdhc3 {
+-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
++ &usdhc3 {
++	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_usdhc3>;
+-	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
+-	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
+-	cd-gpios = <&gpio3 22 0>;
+ 	keep-power-in-suspend;
+ 	enable-sdio-wakeup;
++	vmmc-supply = <&wlan_en_reg>;
++	non-removable;    // non-removable is not a variable, the fact it is listed is all that is used by driver
++	cap-power-off-card;
+ 	status = "okay";
+-};
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@0 {
++		compatible = "ti,wl1835";
++		reg = <2>;
++		interrupt-parent = <&gpio5>;
++		interrupts = <8 IRQ_TYPE_EDGE_RISING>;
++	};
++ };
+-- 
+1.7.9.5
+
