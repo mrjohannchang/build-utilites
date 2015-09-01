@@ -1,0 +1,42 @@
+From b9ff824dfea694de7693f438e8d60265de0fbcce Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Wed, 12 Aug 2015 14:53:33 +0300
+Subject: [PATCH 11/15] imx6q-sabresd: update wilink8 entries for r8.6
+
+Due to changes in upstream there are a couple of device tree related
+parameters that are needed for wilink8 initialization that have changed
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ arch/arm/boot/dts/imx6qdl-sabresd.dtsi |    6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6qdl-sabresd.dtsi b/arch/arm/boot/dts/imx6qdl-sabresd.dtsi
+index e4daafd..b6dd73c 100644
+--- a/arch/arm/boot/dts/imx6qdl-sabresd.dtsi
++++ b/arch/arm/boot/dts/imx6qdl-sabresd.dtsi
+@@ -9,6 +9,7 @@
+  * http://www.opensource.org/licenses/gpl-license.html
+  * http://www.gnu.org/copyleft/gpl.html
+  */
++#include <dt-bindings/interrupt-controller/irq.h>
+ 
+ / {
+ 	aliases {
+@@ -743,11 +744,10 @@
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;
+ 	wlcore: wlcore@0 {
+-		compatible = "ti,wlcore";
++		compatible = "ti,wl1835";
+ 		reg = <2>;
+ 		interrupt-parent = <&gpio4>;
+-		interrupts = <6 0>;
+-		platform-quirks = <1>;
++		interrupts = <6 IRQ_TYPE_EDGE_RISING>;
+ 	};
+ };
+ 
+-- 
+1.7.9.5
+

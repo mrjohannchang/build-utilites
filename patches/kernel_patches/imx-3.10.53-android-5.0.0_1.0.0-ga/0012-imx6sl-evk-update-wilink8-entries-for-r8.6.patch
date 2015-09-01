@@ -1,0 +1,62 @@
+From 3a74fe6b3b54cceabf6747e478824e42b8132ffc Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Wed, 12 Aug 2015 14:53:58 +0300
+Subject: [PATCH 12/15] imx6sl-evk: update wilink8 entries for r8.6
+
+* Due to changes in upstream there are a couple of device tree related
+  parameters that are needed for wilink8 initialization that have changed
+* remove resundant entry for usdhc3 that is used by wilink8
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ arch/arm/boot/dts/imx6sl-evk-common.dtsi |    6 +++---
+ arch/arm/boot/dts/imx6sl-evk.dts         |   11 -----------
+ 2 files changed, 3 insertions(+), 14 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6sl-evk-common.dtsi b/arch/arm/boot/dts/imx6sl-evk-common.dtsi
+index 43258d5..8e67dd0 100644
+--- a/arch/arm/boot/dts/imx6sl-evk-common.dtsi
++++ b/arch/arm/boot/dts/imx6sl-evk-common.dtsi
+@@ -5,6 +5,7 @@
+  * it under the terms of the GNU General Public License version 2 as
+  * published by the Free Software Foundation.
+  */
++#include <dt-bindings/interrupt-controller/irq.h>
+ 
+ / {
+ 	memory {
+@@ -557,10 +558,9 @@
+ 	#address-cells = <1>;
+ 	#size-cells = <0>;
+ 	wlcore: wlcore@0 {
+-		compatible = "ti,wlcore";
++		compatible = "ti,wl1835";
+ 		reg = <2>;
+ 		interrupt-parent = <&gpio5>;
+-		interrupts = <8 0>;
+-		platform-quirks = <1>;
++		interrupts = <8 IRQ_TYPE_EDGE_RISING>;
+ 	};
+ };
+diff --git a/arch/arm/boot/dts/imx6sl-evk.dts b/arch/arm/boot/dts/imx6sl-evk.dts
+index bf67dae..6d18824 100644
+--- a/arch/arm/boot/dts/imx6sl-evk.dts
++++ b/arch/arm/boot/dts/imx6sl-evk.dts
+@@ -417,14 +417,3 @@
+ 	enable-sdio-wakeup;
+ 	status = "okay";
+ };
+-
+-&usdhc3 {
+-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+-	pinctrl-0 = <&pinctrl_usdhc3_1>;
+-	pinctrl-1 = <&pinctrl_usdhc3_1_100mhz>;
+-	pinctrl-2 = <&pinctrl_usdhc3_1_200mhz>;
+-	cd-gpios = <&gpio3 22 0>;
+-	keep-power-in-suspend;
+-	enable-sdio-wakeup;
+-	status = "okay";
+-};
+-- 
+1.7.9.5
+
