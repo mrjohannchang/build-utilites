@@ -100,7 +100,7 @@ git://git.ti.com/ti-bt/service-packs.git
 master
 
 firmware-build
-git@gitorious.design.ti.com:wilink-wlan/firmware-build.git
+git@gitorious.design.ti.com:wilink-wlan/firmware-dev.git
 staging
 
 )
