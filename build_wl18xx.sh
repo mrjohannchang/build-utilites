@@ -812,7 +812,7 @@ function build_all()
 {
     if [ -z $NO_EXTERNAL ] 
     then        
-        [ $DEFAULT_KERNEL ] && build_uimage
+        [ -z $INTREE ] && [ $DEFAULT_KERNEL ] && build_uimage
         build_openssl
         build_libnl
         build_crda
@@ -820,7 +820,8 @@ function build_all()
     
     if [ -z $NO_TI ] 
     then
-        build_modules
+        [ -z $INTREE ] && build_modules
+		[ $INTREE ] && build_intree
         build_iw
         build_wpa_supplicant
         build_hostapd	
@@ -1000,6 +1001,11 @@ function main()
         NO_CLEAN=1 build_all
 		;;
 
+		'all_intree')
+        print_highlight " building all (in-tree) (No clean & no source code update) "
+		#clean_outputs
+        INTREE=1 build_all
+		;;
         *)
         echo " "
         echo "**** Unknown parameter - please see usage below **** "
