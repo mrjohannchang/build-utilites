@@ -459,6 +459,19 @@ function build_crda()
 	cd_back
 }
 
+function build_wl_logger()
+{
+	if [ -d "`repo_path ti_utils`/wl_logproxy" ]; then
+	        cd `repo_path ti_utils`/wl_logproxy
+		[ -z $NO_CLEAN ] && NFSROOT=`path filesystem` make clean
+	        [ -z $NO_CLEAN ] && assert_no_error
+		NLVER=3 NLROOT=`repo_path libnl`/include NFSROOT=`path filesystem` LIBS+=-lpthread make
+	        assert_no_error
+		NFSROOT=`path filesystem` make install
+	        cd_back
+	fi
+}
+
 function build_calibrator()
 {
 	cd_repo ti_utils
@@ -826,6 +839,7 @@ function build_all()
         build_wpa_supplicant
         build_hostapd	
         build_calibrator
+        build_wl_logger
         build_wlconf
         build_fw_download
         build_scripts_download
@@ -953,6 +967,7 @@ function main()
 		'utils')
 		print_highlight " building only ti-utils "
 		build_calibrator
+		build_wl_logger
 		build_wlconf		
 		;;
 
