@@ -1,0 +1,193 @@
+From 57cf1aad225bc6961e2e4b49b091ad7d0f0f5a86 Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Mon, 2 Nov 2015 12:15:53 +0200
+Subject: [PATCH] ARCH:arm:am335x-boneblack: add e14 wl1837 cape support
+
+* enable mmc2 used for wlan and uart1 used for bluetooth
+* configure the gpios used for wlan and bluetooth controls
+* add fixed voltage regulator used for wlan power control
+* enable i2c1 used for mfi control
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi |  156 +++++++++++++++++++++++++
+ arch/arm/boot/dts/am335x-boneblack.dts        |    3 +
+ 2 files changed, 159 insertions(+)
+ create mode 100644 arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi
+
+diff --git a/arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi b/arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi
+new file mode 100644
+index 0000000..2772216
+--- /dev/null
++++ b/arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi
+@@ -0,0 +1,156 @@
++/*
++ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License version 2 as
++ * published by the Free Software Foundation.
++ */
++#include <dt-bindings/interrupt-controller/irq.h>
++
++/ {
++	model = "TI AM335x BeagleBone Black";
++	compatible = "ti,am335x-bone-black", "ti,am335x-bone", "ti,am33xx";
++
++	wlan_en_reg: fixedregulator@1 {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		gpio = <&gpio0 2 0>;
++		enable-active-high;
++	};
++
++	kim {
++		compatible = "kim";
++		nshutdown_gpio = <3>; /* Bank0, pin3 */
++		dev_name = "/dev/ttyO1";
++		flow_cntrl = <1>;
++		baud_rate = <3000000>;
++	};
++
++	btwilink {
++		compatible = "btwilink";
++	};
++};
++
++&am33xx_pinmux {
++	pinctrl-0 = <&clkout2_pin>;
++
++	uart1_pins_default: pinmux_uart1_pins_default {
++		pinctrl-single,pins = <
++			0x180 ( PIN_INPUT  | MUX_MODE0 ) /* (D16) uart1_rxd.uart1_rxd */
++			0x184 ( PIN_OUTPUT | MUX_MODE0 ) /* (D15) uart1_txd.uart1_txd */
++			0x178 ( PIN_INPUT  | MUX_MODE0 ) /* (D18) uart1_ctsn.uart1_ctsn */
++			0x17c ( PIN_OUTPUT_PULLDOWN | MUX_MODE0 ) /* (D17) uart1_rtsn.uart1_rtsn */
++		>;
++	};
++
++	uart1_pins_sleep: pinmux_uart1_pins_sleep {
++		pinctrl-single,pins = <
++			0x180 ( PIN_INPUT  | MUX_MODE0 ) /* (D16) uart1_rxd.uart1_rxd */
++			0x184 ( PIN_OUTPUT | MUX_MODE0 ) /* (D15) uart1_txd.uart1_txd */
++			0x178 ( PIN_INPUT  | MUX_MODE0 ) /* (D18) uart1_ctsn.uart1_ctsn */
++			0x17c ( PIN_OUTPUT | MUX_MODE0 ) /* (D17) uart1_rtsn.uart1_rtsn  */
++		>;
++	};
++
++	bt_pins_default: pinmux_bt_pins_default {
++		pinctrl-single,pins = <
++			0x154 (PIN_OUTPUT_PULLUP   | MUX_MODE7) /* gpio0_3 BT_EN*/
++		>;
++	};
++
++	bt_pins_sleep: pinmux_bt_pins_sleep {
++		pinctrl-single,pins = <
++			0x154 (PIN_OUTPUT_PULLUP   | MUX_MODE7) /* gpio0_3 BT_EN*/
++		>;
++	};
++
++	mmc2_pins: pinmux_mmc2_pins {
++		pinctrl-single,pins = <
++			0x80 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpmc_csn1.mmc1_clk */
++			0x84 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpmc_csn2.mmc1_cmd */
++			0x00 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad0.mmc1_dat0 */
++			0x04 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad1.mmc1_dat1 */
++			0x08 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad2.mmc1_dat2 */
++			0x0c (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad3.mmc1_dat3 */
++		>;
++	};
++
++	mmc2_pins_sleep: pinmux_mmc2_pins_sleep {
++		pinctrl-single,pins = <
++			0x80 (PIN_INPUT_PULLDOWN | MUX_MODE7) /* gpmc_csn1.mmc1_clk */
++			0x84 (PIN_INPUT_PULLDOWN | MUX_MODE7) /* gpmc_csn2.mmc1_cmd */
++			0x00 (PIN_INPUT_PULLDOWN | MUX_MODE7) /* gpmc_ad0.mmc1_dat0 */
++			0x04 (PIN_INPUT_PULLDOWN | MUX_MODE7) /* gpmc_ad1.mmc1_dat1 */
++			0x08 (PIN_INPUT_PULLDOWN | MUX_MODE7) /* gpmc_ad2.mmc1_dat2 */
++			0x0c (PIN_INPUT_PULLDOWN | MUX_MODE7) /* gpmc_ad3.mmc1_dat3 */
++		>;
++	};
++
++	wlan_pins_default: pinmux_wlan_pins_default {
++		pinctrl-single,pins = <
++			0x150 (PIN_OUTPUT_PULLUP   | MUX_MODE7) /* gpio0_2 WL_EN*/
++			0x164 (PIN_INPUT_PULLUP    | MUX_MODE7) /* gpio0_7 WL_IRQ*/
++			0x7C  (PIN_OUTPUT_PULLUP   | MUX_MODE0) /* gpmc_csn0.gpio1_29 Cape_Buffer_EN*/
++			0x90  (PIN_OUTPUT_PULLDOWN | MUX_MODE7) /* gpmc_advn_ale.gpio2_2  Audio_sync*/
++		>;
++	};
++
++	wlan_pins_sleep: pinmux_wlan_pins_sleep {
++		pinctrl-single,pins = <
++			0x150 (PIN_OUTPUT_PULLUP   | MUX_MODE7) /* gpio0_2 WL_EN*/
++			0x164 (PIN_INPUT_PULLUP    | MUX_MODE7) /* gpio0_7 WL_IRQ*/
++			0x7C  (PIN_OUTPUT_PULLUP   | MUX_MODE0) /* gpmc_csn0.gpio1_29 Cape_Buffer_EN*/
++			0x90  (PIN_OUTPUT_PULLDOWN | MUX_MODE7) /* gpmc_advn_ale.gpio2_2  Audio_sync*/
++		>;
++	};
++
++	i2c1_pins: pinmux_i2c1_pins {
++		pinctrl-single,pins = <
++			0x15c (PIN_INPUT_PULLUP | MUX_MODE2)	/* i2c1 */
++			0x158 (PIN_INPUT_PULLUP | MUX_MODE2)	/* i2c1 */
++		>;
++	};
++};
++
++&uart1 {
++	pinctrl-names = "default","sleep";
++	pinctrl-0 = <&uart1_pins_default &bt_pins_default>;
++	pinctrl-1 = <&uart1_pins_sleep &bt_pins_sleep>;
++	status = "okay";
++};
++
++&i2c1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c1_pins>;
++
++	status = "okay";
++	clock-frequency = <400000>;
++
++	tps1: tps@24 {
++		reg = <0x24>;
++	};
++};
++
++&mmc2 {
++	status = "okay";
++	vmmc-supply = <&wlan_en_reg>;
++	bus-width = <4>;
++	pinctrl-names = "default", "sleep";
++	pinctrl-0 = <&mmc2_pins &wlan_pins_default>;
++	pinctrl-1 = <&mmc2_pins_sleep &wlan_pins_sleep>;
++	ti,non-removable;
++	ti,needs-special-hs-handling;
++	cap-power-off-card;
++	keep-power-in-suspend;
++
++	#address-cells = <1>;
++	#size-cells = <0>;
++	wlcore: wlcore@0 {
++		compatible = "ti,wl1835";
++		reg = <2>;
++		interrupt-parent = <&gpio0>;
++		interrupts = <7 IRQ_TYPE_EDGE_RISING>;
++	};
++};
+diff --git a/arch/arm/boot/dts/am335x-boneblack.dts b/arch/arm/boot/dts/am335x-boneblack.dts
+index 369f34d..b40d168 100644
+--- a/arch/arm/boot/dts/am335x-boneblack.dts
++++ b/arch/arm/boot/dts/am335x-boneblack.dts
+@@ -147,3 +147,6 @@
+ 		clock-names = "mclk";
+ 	};
+ };
++
++/* Overlay the wilink8 based cape support */
++#include "am335x-bone-e14-wl1837.dtsi"
+-- 
+1.7.9.5
+
