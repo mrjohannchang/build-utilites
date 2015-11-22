@@ -177,6 +177,7 @@ function setup_environment()
         DEFAULT_TOOLCHAIN=1
     fi   
 
+
     #if no kernel path is set - download it.
     if [[ "$KERNEL_PATH" == "DEFAULT" ]]
     then            
@@ -194,8 +195,8 @@ function setup_environment()
 	export LIBNL_PATH=`repo_path libnl`	
 	export KLIB=`path filesystem`
 	export KLIB_BUILD=${KERNEL_PATH}
-        export GIT_TREE=`repo_path driver`
-        export PATH=$TOOLCHAIN_PATH:$PATH
+	export GIT_TREE=`repo_path driver`
+	export PATH=$TOOLCHAIN_PATH:$PATH
     
 }
 
@@ -274,7 +275,7 @@ function setup_toolchain()
 
 function build_intree()
 {
-    cd_repo driver
+	cd_repo driver
 	export KERNEL_PATH=`repo_path driver`
 	read_kernel_version
 	[ $CONFIG ] && cp `path configuration`/kernel_$KERNEL_VERSION.$KERNEL_PATCHLEVEL.config `repo_path driver`/.config
@@ -291,6 +292,12 @@ function build_intree()
 	cp `repo_path driver`/arch/arm/boot/dts/am335x-*.dtb `path tftp`/
 
 	assert_no_error
+
+	[ -e ./outputs/drv_skeleton.tar ] && rm ./outputs/drv_skeleton.tar
+	cd `path filesystem`
+	find ./ -name wl*.ko -exec tar rf ../outputs/drv_skeleton.tar {$1} \;
+	find ./ -name *80211*.ko -exec tar rf ../outputs/drv_skeleton.tar {$1} \;
+
 	cd_back
 }
 
