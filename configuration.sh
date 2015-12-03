@@ -49,11 +49,11 @@ sitara-ti-linux-3.14.y-wlcore
 
 openssl
 git://github.com/openssl/openssl
-OpenSSL_1_0_1g
+OpenSSL_1_0_2d
 
 libnl
 git://github.com/tgraf/libnl.git
-libnl3_2_24
+libnl3_2_25
 
 crda
 git://git.ti.com/wilink8-wlan/crda.git
