@@ -704,6 +704,49 @@ function set_files_to_verify()
         `repo_path ti_utils`/wlconf/wlconf
         "ELF 32-bit LSB[ ]*executable, ARM"
         )
+
+	[ -z $INTREE ] &&         files_to_verify=(
+        # skeleton path
+        # source path
+        # pattern in output of file
+
+        `path filesystem`/usr/local/sbin/wpa_supplicant
+        `repo_path hostap`/wpa_supplicant/wpa_supplicant
+        "ELF 32-bit LSB[ ]*executable, ARM"
+
+        `path filesystem`/usr/local/bin/hostapd
+        `repo_path hostap`/hostapd/hostapd
+        "ELF 32-bit LSB[ ]*executable, ARM"
+
+        `path filesystem`/sbin/crda
+        `repo_path crda`/crda
+        "ELF 32-bit LSB[ ]*executable, ARM"
+
+        `path filesystem`/usr/lib/crda/regulatory.bin
+        `repo_path wireless_regdb`/regulatory.bin
+        "CRDA wireless regulatory database file"
+
+        `path filesystem`/lib/firmware/ti-connectivity/wl18xx-fw-4.bin
+        `repo_path fw_download`/wl18xx-fw-4.bin
+        "data"
+
+        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/kernel/drivers/net/wireless/ti/wl18xx/wl18xx.ko
+        `repo_path driver`/drivers/net/wireless/ti/wl18xx/wl18xx.ko
+        "ELF 32-bit LSB[ ]*relocatable, ARM"
+
+        `path filesystem`/lib/modules/$KERNEL_VERSION.$KERNEL_PATCHLEVEL.*/kernel/drivers/net/wireless/ti/wlcore/wlcore.ko
+        `repo_path driver`/drivers/net/wireless/ti/wlcore/wlcore.ko
+        "ELF 32-bit LSB[ ]*relocatable, ARM"
+
+        #`path filesystem`/usr/bin/calibrator
+        #`repo_path ti_utils`/calibrator
+        #"ELF 32-bit LSB[ ]*executable, ARM"
+
+        `path filesystem`/usr/sbin/wlconf/wlconf
+        `repo_path ti_utils`/wlconf/wlconf
+        "ELF 32-bit LSB[ ]*executable, ARM"
+        ) 
+
 }
 
 function get_tag()
