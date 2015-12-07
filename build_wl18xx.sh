@@ -705,7 +705,7 @@ function set_files_to_verify()
         "ELF 32-bit LSB[ ]*executable, ARM"
         )
 
-	[ -z $INTREE ] &&         files_to_verify=(
+		[ $INTREE ] && files_to_verify=(
         # skeleton path
         # source path
         # pattern in output of file
