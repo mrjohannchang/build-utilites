@@ -3,7 +3,7 @@ fs_skeleton.tbz2
 )
 
 toolchain=(
-https://launchpad.net/linaro-toolchain-binaries/trunk/2013.03/+download/gcc-linaro-arm-linux-gnueabihf-4.7-2013.03-20130313_linux.tar.bz2
+http://releases.linaro.org/15.05/components/toolchain/binaries/arm-linux-gnueabihf/gcc-linaro-4.9-2015.05-x86_64_arm-linux-gnueabihf.tar.xz
 )
 
 paths=(
@@ -69,7 +69,7 @@ upstream_41
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
-upstream_24
+upstream_25+
 
 ti_utils
 git://git.ti.com/wilink8-wlan/18xx-ti-utils.git
