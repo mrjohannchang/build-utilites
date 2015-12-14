@@ -286,6 +286,9 @@ function build_intree()
 	make -j${PROCESSORS_NUMBER} am335x-evm.dtb
 	make -j${PROCESSORS_NUMBER} am335x-bone.dtb
 	make -j${PROCESSORS_NUMBER} am335x-boneblack.dtb
+	make -j${PROCESSORS_NUMBER} am335x-boneblack-e14-wl1837.dtb
+	make -j${PROCESSORS_NUMBER} am335x-boneblack-su-audio.dtb
+	make -j${PROCESSORS_NUMBER} am335x-boneblack-wl1835.dtb
 	make -j${PROCESSORS_NUMBER} modules
 	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} modules_install
 	cp `repo_path driver`/arch/arm/boot/zImage `path tftp`/zImage
