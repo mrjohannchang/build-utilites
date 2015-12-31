@@ -296,8 +296,8 @@ function build_intree()
 
 	assert_no_error
 
-	[ -e ./outputs/drv_skeleton.tar ] && rm ./outputs/drv_skeleton.tar
 	cd `path filesystem`
+	[ -f ../outputs/drv_skeleton.tar ] && rm ../outputs/drv_skeleton.tar
 	find ./ -name wl*.ko -exec tar rf ../outputs/drv_skeleton.tar {$1} \;
 	find ./ -name *80211*.ko -exec tar rf ../outputs/drv_skeleton.tar {$1} \;
 
