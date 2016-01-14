@@ -29,6 +29,7 @@ function usage ()
     echo "                          update       <head|TAG>  [ Update to specific TAG & Build ] "
     echo "                          clean                    [ Clean & Build                  ] "
     echo "                          <empty>                  [ Build w/o update               ] "
+     echo "                         all_intree               [ Build driver and kernel intree ] " 
     echo "                          check_updates            [ Check for build script updates ] "
     echo ""
     echo "Building specific component :"
