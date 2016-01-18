@@ -45,7 +45,7 @@ repositories=(
 
 kernel
 git://git.ti.com/wilink8-wlan/wilink8-wlan-ti-linux-kernel.git
-sitara-ti-linux-3.14.y-wlcore
+processor-sdk-linux-02.00.00
 
 openssl
 git://github.com/openssl/openssl
