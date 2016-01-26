@@ -284,6 +284,7 @@ function build_intree()
 
 	make -j${PROCESSORS_NUMBER} zImage
 	make -j${PROCESSORS_NUMBER} am335x-evm.dtb
+	make -j${PROCESSORS_NUMBER} am335x-evm-wow.dtb
 	make -j${PROCESSORS_NUMBER} am335x-bone.dtb
 	make -j${PROCESSORS_NUMBER} am335x-boneblack.dtb
 	make -j${PROCESSORS_NUMBER} am335x-boneblack-e14-wl1837.dtb
