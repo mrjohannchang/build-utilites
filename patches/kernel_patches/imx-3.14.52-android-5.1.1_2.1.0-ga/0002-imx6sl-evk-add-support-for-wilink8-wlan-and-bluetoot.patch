@@ -1,0 +1,180 @@
+From d69f6aa48fa5b4c464a31549c2dbff80760a90cd Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Mon, 23 Mar 2015 13:14:06 +0200
+Subject: [PATCH 02/12] imx6sl-evk: add support for wilink8 wlan and bluetooth
+
+* enable uart4 used for bluetooth with wilink8 with flow control
+* configure SD3 to be used for sdio communication to wilink8 wlan
+* configure gpios used for wlan/bt enables and wlan_irq
+* setup voltage regulator used for wl8 wlan power control
+* disable SD1 as it pins are used for BT/WLAN EN, IRQ, BT UART
+
+Signed-off-by: Alexey Berd <alexeyb@ti.com>
+
+The original drive strength value of 90 OHM was too strong causing
+detection issues of some modules on the sdio bus.
+Reducing the io strength to 50 OHM solves this issue
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ arch/arm/boot/dts/imx6sl-evk.dts |  104 ++++++++++++++++++++------------------
+ 1 file changed, 56 insertions(+), 48 deletions(-)
+
+diff --git a/arch/arm/boot/dts/imx6sl-evk.dts b/arch/arm/boot/dts/imx6sl-evk.dts
+index 36e26a5..848a658 100644
+--- a/arch/arm/boot/dts/imx6sl-evk.dts
++++ b/arch/arm/boot/dts/imx6sl-evk.dts
+@@ -9,12 +9,35 @@
+ /dts-v1/;
+ 
+ #include <dt-bindings/input/input.h>
++#include <dt-bindings/interrupt-controller/irq.h>
+ #include "imx6sl.dtsi"
+ 
+ / {
+ 	model = "Freescale i.MX6 SoloLite EVK Board";
+ 	compatible = "fsl,imx6sl-evk", "fsl,imx6sl";
+ 
++	wlan_en_reg: fixedregulator@2 {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <1800000>;
++		/* WLAN_EN GPIO for this board - Bank5, pin13 */
++		gpio = <&gpio5 13 0>;
++		enable-active-high;
++	};
++
++	kim {
++	        compatible = "kim";
++	        nshutdown_gpio = <134>;  // GPIO5_6 The wl8 driver expects gpio to be an integer, so gpio5_6 is (5-1)*32+6=134
++	        dev_name = "/dev/ttymxc3";
++	        flow_cntrl = <1>;
++	        baud_rate = <3000000>;
++	};
++
++	btwilink {
++	        compatible = "btwilink";
++	};
++
+ 	battery: max8903@0 {
+ 		compatible = "fsl,max8903-charger";
+ 		pinctrl-names = "default";
+@@ -707,19 +730,11 @@
+ 
+ 		pinctrl_uart4_1: uart4grp-1 {
+ 			fsl,pins = <
+-				MX6SL_PAD_SD1_DAT4__UART4_RX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT5__UART4_TX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT7__UART4_CTS_B		0x1b0b1
+-				MX6SL_PAD_SD1_DAT6__UART4_RTS_B		0x1b0b1
+-			>;
+-		};
+-
+-		pinctrl_uart4dte_1: uart4dtegrp-1 {
+-			fsl,pins = <
+-				MX6SL_PAD_SD1_DAT5__UART4_RX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT4__UART4_TX_DATA	0x1b0b1
+-				MX6SL_PAD_SD1_DAT6__UART4_CTS_B		0x1b0b1
+-				MX6SL_PAD_SD1_DAT7__UART4_RTS_B		0x1b0b1
++				MX6SL_PAD_SD1_DAT4__UART4_RX_DATA 0x13059 // used for HOST_HCI_RX
++				MX6SL_PAD_SD1_DAT5__UART4_TX_DATA 0x13059 // used for HOST_HCI_TX
++				MX6SL_PAD_SD1_DAT7__UART4_CTS_B 0x13059   // used for HOST_HCI_RTS, note reversed to TI nomenclature
++				MX6SL_PAD_SD1_DAT6__UART4_RTS_B 0x13059   // used for HOST_HCI_CTS
++				MX6SL_PAD_SD1_DAT3__GPIO5_IO06  0x13059   // used for BT_EN
+ 			>;
+ 		};
+ 
+@@ -806,25 +821,14 @@
+ 
+ 		pinctrl_usdhc3: usdhc3grp {
+ 			fsl,pins = <
+-				MX6SL_PAD_SD3_CMD__SD3_CMD		0x17059
+-				MX6SL_PAD_SD3_CLK__SD3_CLK		0x10059
+-				MX6SL_PAD_SD3_DAT0__SD3_DATA0		0x17059
+-			>;
+-		};
+-
+-		pinctrl_usdhc3_100mhz: usdhc3grp100mhz {
+-			fsl,pins = <
+-				MX6SL_PAD_SD3_CMD__SD3_CMD		0x170b9
+-				MX6SL_PAD_SD3_CLK__SD3_CLK		0x100b9
+-				MX6SL_PAD_SD3_DAT0__SD3_DATA0		0x170b9
+-			>;
+-		};
+-
+-		pinctrl_usdhc3_200mhz: usdhc3grp200mhz {
+-			fsl,pins = <
+-				MX6SL_PAD_SD3_CMD__SD3_CMD		0x170f9
+-				MX6SL_PAD_SD3_CLK__SD3_CLK		0x100f9
+-				MX6SL_PAD_SD3_DAT0__SD3_DATA0		0x170f9
++				MX6SL_PAD_SD3_CMD__SD3_CMD		0x17069
++				MX6SL_PAD_SD3_CLK__SD3_CLK		0x10069
++				MX6SL_PAD_SD3_DAT0__SD3_DATA0		0x17069
++ 				MX6SL_PAD_SD3_DAT1__SD3_DATA1 		0x17069
++ 				MX6SL_PAD_SD3_DAT2__SD3_DATA2 		0x17069
++ 				MX6SL_PAD_SD3_DAT3__SD3_DATA3 		0x17069
++				MX6SL_PAD_SD1_DAT2__GPIO5_IO13  	0x13059   // reserve two pins from sd1 for wl8 gpio, this is pulled low at reset for WL_EN
++				MX6SL_PAD_SD1_DAT1__GPIO5_IO08  	0x13059   // this is for wl_irq which driver will configure as an input with a pull down
+ 			>;
+ 		};
+ 
+@@ -935,6 +939,13 @@
+ 	status = "okay";
+ };
+ 
++&uart4 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&pinctrl_uart4_1>;
++	status = "okay";
++	fsl,uart-has-rtscts;      // enable rts/cts usage on uart4
++};
++
+ &usbotg1 {
+ 	vbus-supply = <&reg_usb_otg1_vbus>;
+ 	pinctrl-names = "default";
+@@ -953,21 +964,6 @@
+ 	status = "okay";
+ };
+ 
+-&usdhc1 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&pinctrl_usdhc1>;
+-	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
+-	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+-	bus-width = <4>;
+-	cd-gpios = <&gpio4 7 0>;
+-	wp-gpios = <&gpio4 6 0>;
+-	keep-power-in-suspend;
+-	enable-sdio-wakeup;
+-	wifi-host;
+-	pm-ignore-notify;
+-	status = "okay";
+-};
+-
+ &usdhc2 {
+ 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+ 	pinctrl-0 = <&pinctrl_usdhc2>;
+@@ -983,6 +979,18 @@
+ &usdhc3 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&pinctrl_usdhc3>;
+-	bus-width = <1>;
++	keep-power-in-suspend;
++	enable-sdio-wakeup;
++	vmmc-supply = <&wlan_en_reg>;
++	non-removable;    // non-removable is not a variable, the fact it is listed is all that is used by driver
++	cap-power-off-card;
++	#address-cells = <1>;
++	#size-cells = <0>;
+ 	status = "okay";
++	wlcore: wlcore@0 {
++		compatible = "ti,wl1835";
++		reg = <2>;
++		interrupt-parent = <&gpio5>;
++		interrupts = <8 IRQ_TYPE_EDGE_RISING>;
++	};
+ };
+-- 
+1.7.9.5
+

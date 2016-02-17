@@ -1,0 +1,185 @@
+From 46ee505111ca777090f33198a587fc066c1f9396 Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Wed, 17 Feb 2016 15:47:03 +0200
+Subject: [PATCH] sabresd_6dq: add wilink8 wlan platform support
+
+Add wilink8 wlan support to the imx6 sabresd board.
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ imx6/imx6.mk               |    1 -
+ imx6/sabresd_6dq.mk        |    5 +++++
+ sabresd_6dq/BoardConfig.mk |   32 ++++++++++++++++++++++++------
+ sabresd_6dq/init.rc        |   46 ++++++++++----------------------------------
+ 4 files changed, 41 insertions(+), 43 deletions(-)
+
+diff --git a/imx6/imx6.mk b/imx6/imx6.mk
+index e478de1..0d8df3c 100644
+--- a/imx6/imx6.mk
++++ b/imx6/imx6.mk
+@@ -41,7 +41,6 @@ PRODUCT_PACKAGES += \
+ 	ip-up-vpn				\
+ 	ip-up-ppp0				\
+ 	ip-down-ppp0				\
+-	rtl_wpa_supplicant			\
+ 	wpa_supplicant				\
+ 	wpa_supplicant.conf			\
+ 	p2p_supplicant_overlay.conf			\
+diff --git a/imx6/sabresd_6dq.mk b/imx6/sabresd_6dq.mk
+index c6f9f7e..9c7046b 100644
+--- a/imx6/sabresd_6dq.mk
++++ b/imx6/sabresd_6dq.mk
+@@ -61,3 +61,8 @@ PRODUCT_COPY_FILES += \
+ 	frameworks/native/data/etc/android.hardware.ethernet.xml:system/etc/permissions/android.hardware.ethernet.xml \
+ 	device/fsl/sabresd_6dq/required_hardware.xml:system/etc/permissions/required_hardware.xml
+ PRODUCT_PACKAGES += AudioRoute
++
++$(call inherit-product-if-exists, device/ti/proprietary-open/wl12xx/wlan/wl12xx-wlan-fw-products.mk)
++#$(call inherit-product-if-exists, device/ti/proprietary-open/wl12xx/wpan/wl12xx-wpan-fw-products.mk)
++#$(call inherit-product-if-exists, hardware/ti/wpan/ti-wpan-products.mk)
++
+diff --git a/sabresd_6dq/BoardConfig.mk b/sabresd_6dq/BoardConfig.mk
+index e2d036b..3e75615 100644
+--- a/sabresd_6dq/BoardConfig.mk
++++ b/sabresd_6dq/BoardConfig.mk
+@@ -46,12 +46,18 @@ PRODUCT_MODEL := SABRESD-MX6DQ
+ 
+ TARGET_RELEASETOOLS_EXTENSIONS := device/fsl/imx6
+ # UNITE is a virtual device support both atheros and realtek wifi(ar6103 and rtl8723as)
+-BOARD_WLAN_DEVICE            := UNITE
+-WPA_SUPPLICANT_VERSION       := VER_0_8_UNITE
++#BOARD_WLAN_DEVICE            := UNITE
++#WPA_SUPPLICANT_VERSION       := VER_0_8_UNITE
+ TARGET_KERNEL_MODULES        := \
+-                                kernel_imx/net/wireless/cfg80211.ko:system/lib/modules/cfg80211_realtek.ko \
+-                                kernel_imx/drivers/net/wireless/rtlwifi/rtl8821as/8821as.ko:system/lib/modules/8821as.ko \
+-                                kernel_imx/drivers/net/wireless/bcmdhd/bcmdhd.ko:system/lib/modules/bcmdhd.ko
++				hardware/ti/wlan/mac80211/compat_wl18xx/compat/compat.ko:system/lib/modules/compat.ko \
++				hardware/ti/wlan/mac80211/compat_wl18xx/net/mac80211/mac80211.ko:system/lib/modules/mac80211.ko \
++				hardware/ti/wlan/mac80211/compat_wl18xx/net/wireless/cfg80211.ko:system/lib/modules/cfg80211.ko \
++				hardware/ti/wlan/mac80211/compat_wl18xx/drivers/net/wireless/ti/wl18xx/wl18xx.ko:system/lib/modules/wl18xx.ko \
++				hardware/ti/wlan/mac80211/compat_wl18xx/drivers/net/wireless/ti/wlcore/wlcore.ko:system/lib/modules/wlcore.ko \
++				hardware/ti/wlan/mac80211/compat_wl18xx/drivers/net/wireless/ti/wlcore/wlcore_sdio.ko:system/lib/modules/wlcore_sdio.ko
++#                                kernel_imx/net/wireless/cfg80211.ko:system/lib/modules/cfg80211_realtek.ko \
++#                                kernel_imx/drivers/net/wireless/rtlwifi/rtl8821as/8821as.ko:system/lib/modules/8821as.ko \
++#                                kernel_imx/drivers/net/wireless/bcmdhd/bcmdhd.ko:system/lib/modules/bcmdhd.ko
+ 
+ BOARD_WPA_SUPPLICANT_DRIVER  := NL80211
+ BOARD_HOSTAPD_DRIVER         := NL80211
+@@ -61,7 +67,7 @@ BOARD_WPA_SUPPLICANT_PRIVATE_LIB_RTL        := lib_driver_cmd_rtl
+ BOARD_HOSTAPD_PRIVATE_LIB_BCM               := lib_driver_cmd_bcmdhd
+ BOARD_WPA_SUPPLICANT_PRIVATE_LIB_BCM        := lib_driver_cmd_bcmdhd
+ 
+-BOARD_SUPPORT_BCM_WIFI  := true
++#BOARD_SUPPORT_BCM_WIFI  := true
+ #for intel vendor
+ ifeq ($(BOARD_WLAN_VENDOR),INTEL)
+ BOARD_HOSTAPD_PRIVATE_LIB                := private_lib_driver_cmd
+@@ -74,6 +80,20 @@ WIFI_DRIVER_MODULE_NAME                  := "iwlagn"
+ WIFI_DRIVER_MODULE_PATH                  ?= auto
+ endif
+ 
++# Connectivity - Wi-Fi
++USES_TI_MAC80211 := true
++ifeq ($(USES_TI_MAC80211),true)
++BOARD_WPA_SUPPLICANT_DRIVER := NL80211
++WPA_SUPPLICANT_VERSION      := VER_0_8_X
++BOARD_HOSTAPD_DRIVER        := NL80211
++BOARD_WPA_SUPPLICANT_PRIVATE_LIB  := lib_driver_cmd_wl12xx
++BOARD_HOSTAPD_PRIVATE_LIB         := lib_driver_cmd_wl12xx
++BOARD_WLAN_DEVICE           := wl12xx_mac80211
++BOARD_SOFTAP_DEVICE         := wl12xx_mac80211
++COMMON_GLOBAL_CFLAGS += -DUSES_TI_MAC80211
++COMMON_GLOBAL_CFLAGS += -DANDROID_P2P_STUB
++endif
++
+ WIFI_DRIVER_FW_PATH_STA        := "/system/etc/firmware/bcm/fw_bcmdhd.bin"
+ WIFI_DRIVER_FW_PATH_P2P        := "/system/etc/firmware/bcm/fw_bcmdhd.bin"
+ WIFI_DRIVER_FW_PATH_AP         := "/system/etc/firmware/bcm/fw_bcmdhd_apsta.bin"
+diff --git a/sabresd_6dq/init.rc b/sabresd_6dq/init.rc
+index e65826f..84f4edd 100755
+--- a/sabresd_6dq/init.rc
++++ b/sabresd_6dq/init.rc
+@@ -35,6 +35,14 @@ on init
+     write /sys/class/vtconsole/vtcon1/bind 0
+ 
+ on boot
++    # wl18xx wi-fi
++    insmod /system/lib/modules/compat.ko
++    insmod /system/lib/modules/cfg80211.ko
++    insmod /system/lib/modules/mac80211.ko
++    insmod /system/lib/modules/wlcore.ko
++    insmod /system/lib/modules/wl12xx.ko
++    insmod /system/lib/modules/wl18xx.ko
++    insmod /system/lib/modules/wlcore_sdio.ko
+ 
+     # emmulate battery property
+     setprop sys.emulated.battery 1
+@@ -93,7 +101,7 @@ on boot
+ 
+ 
+ #  Enable adb security for JB4.2.2
+-    setprop ro.adb.secure 1
++    setprop ro.adb.secure 0
+ 
+     # Set rotation to 270 to cofigure as portrait mode
+     setprop ro.sf.hwrotation 0
+@@ -195,40 +203,13 @@ on property:sys.interactive="active"
+     chown system system /sys/devices/system/cpu/cpufreq/interactive/io_is_busy
+     chmod 0660 /sys/devices/system/cpu/cpufreq/interactive/io_is_busy
+ 
+-
+ service p2p_supplicant /system/bin/wpa_supplicant \
+-    -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf \
+-    -I/system/etc/wifi/p2p_supplicant_advance_overlay.conf -N \
+     -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+     -I/system/etc/wifi/wpa_supplicant_overlay.conf \
+-    -O/data/misc/wifi/sockets -puse_p2p_group_interface=1 \
++    -O/data/misc/wifi/sockets -pp2p_device=1\
+     -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
+-    class late_start
+     socket wpa_wlan0 dgram 660 wifi wifi
+-    disabled
+-    oneshot
+-
+-service rtw_suppl_con /system/bin/rtl_wpa_supplicant \
+-    -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf \
+-    -I/system/etc/wifi/p2p_supplicant_overlay.conf -N \
+-    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+-    -I/system/etc/wifi/wpa_supplicant_overlay.conf \
+-    -O/data/misc/wifi/sockets -puse_p2p_group_interface=1 \
+-    -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
+     class late_start
+-    socket wpa_wlan0 dgram 660 wifi wifi
+-    disabled
+-    oneshot
+-
+-service rtw_supplc_adv /system/bin/rtl_wpa_supplicant \
+-    -ip2p0 -Dnl80211 -c/data/misc/wifi/p2p_supplicant.conf \
+-    -I/system/etc/wifi/p2p_supplicant_advance_overlay.conf -N \
+-    -iwlan0 -Dnl80211 -c/data/misc/wifi/wpa_supplicant.conf \
+-    -I/system/etc/wifi/wpa_supplicant_overlay.conf \
+-    -O/data/misc/wifi/sockets -puse_p2p_group_interface=1 \
+-    -e/data/misc/wifi/entropy.bin -g@android:wpa_wlan0
+-    class late_start
+-    socket wpa_wlan0 dgram 660 wifi wifi
+     disabled
+     oneshot
+ 
+@@ -302,13 +283,6 @@ service hostapd /system/bin/hostapd /data/misc/wifi/hostapd.conf
+     oneshot
+     disabled
+ 
+-service rtl_hostapd /system/bin/hostapd /data/misc/wifi/hostapd.conf
+-    socket hostapd_wlan0 dgram 660 root wifi
+-    user root
+-    group wifi
+-    oneshot
+-    disabled
+-
+ service ril-daemon /system/bin/rild
+     class main
+     socket rild stream 660 root radio
+-- 
+1.7.9.5
+
