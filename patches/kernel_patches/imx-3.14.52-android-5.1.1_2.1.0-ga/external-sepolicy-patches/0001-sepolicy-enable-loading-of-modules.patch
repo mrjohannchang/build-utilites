@@ -1,0 +1,27 @@
+From abbe2fdb8654ab914125cdf4024efbbd6663d0bf Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Thu, 18 Feb 2016 11:09:26 +0200
+Subject: [PATCH] sepolicy: enable loading of modules
+
+Allow kernel modules to be loaded "insmod" on boot
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ init.te |    1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/init.te b/init.te
+index b5b7993..a63b063 100644
+--- a/init.te
++++ b/init.te
+@@ -5,6 +5,7 @@ unconfined_domain(init)
+ tmpfs_domain(init)
+ 
+ allow init self:capability { sys_rawio mknod };
++allow init self:capability { sys_module };
+ 
+ # Run helpers from / or /system without changing domain.
+ # We do not include exec_type here since generally those
+-- 
+1.7.9.5
+
