@@ -1025,6 +1025,14 @@ function main()
 		build_wlconf		
 		;;
 
+		'all_hostap')
+                print_highlight " building hostap and dependencies "
+                build_libnl
+                build_openssl
+                build_wpa_supplicant
+		build_hostapd
+                ;; 
+
 		'firmware')
 		print_highlight " building only firmware"
 		build_fw_download
