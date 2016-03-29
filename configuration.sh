@@ -61,7 +61,7 @@ master
 
 wireless_regdb
 git://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git
-master-2015-05-15
+master-2016-02-08
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
@@ -89,7 +89,7 @@ upstream_41
 
 iw
 git://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git
-v3.15
+v4.1
 
 uim
 git://git.ti.com/ti-bt/uim.git
