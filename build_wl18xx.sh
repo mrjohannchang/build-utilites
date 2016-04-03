@@ -947,7 +947,7 @@ function main()
         clean_outputs
         setup_workspace
         read_kernel_version #####read kernel version again after update#####
-        build_all
+        [[ -z $NO_BUILD ]] && build_all
 		;;
         
 		'openlink')
