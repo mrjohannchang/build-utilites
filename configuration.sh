@@ -69,7 +69,7 @@ upstream_41
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
-upstream_25_next
+upstream_25_rebase
 
 ti_utils
 git://git.ti.com/wilink8-wlan/18xx-ti-utils.git
