@@ -1,0 +1,79 @@
+From 9535933a48b084df96b3d565227b0999367fd751 Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Tue, 3 May 2016 14:07:55 +0300
+Subject: [PATCH 2/2] sama5d2_xplained: add wilink8 wifi support
+
+The wilink8 module can be connected to the sama5d2-xplained platform
+using the sdmmc1 port and two out-of-band gpio control lines.
+Add wilink8 wlan device tree support with the following additions:
+
+- PA23 is muxed as gpio and used for wlan_enable
+- PA24 is muxed as gpio as gpio and used for wlan_irq
+- Add fixed regulator controling wlan_enable and attach it to sdmmc1
+  that the wilink8 module is connected to.
+- Add the wlore subnode information into the sdmmc1 node.
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ .../arm/boot/dts/at91-sama5d2_xplained_common.dtsi |   30 +++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm/boot/dts/at91-sama5d2_xplained_common.dtsi b/arch/arm/boot/dts/at91-sama5d2_xplained_common.dtsi
+index fde52a6..f32e4d8 100644
+--- a/arch/arm/boot/dts/at91-sama5d2_xplained_common.dtsi
++++ b/arch/arm/boot/dts/at91-sama5d2_xplained_common.dtsi
+@@ -79,6 +79,15 @@
+ 		};
+ 	};
+ 
++	wlan_en_reg: fixedregulator {
++		compatible = "regulator-fixed";
++		regulator-name = "wlan-en-regulator";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		gpio = <&pioA 23 GPIO_ACTIVE_HIGH>;
++		enable-active-high;
++	};
++
+ 	ahb {
+ 		usb0: gadget@00300000 {
+ 			atmel,vbus-gpio = <&pioA 31 GPIO_ACTIVE_HIGH>;
+@@ -114,8 +123,21 @@
+ 		sdmmc1: sdio-host@b0000000 {
+ 			bus-width = <4>;
+ 			pinctrl-names = "default";
+-			pinctrl-0 = <&pinctrl_sdmmc1_default>;
++			pinctrl-0 = <&pinctrl_sdmmc1_default &pinctrl_wlan_default>;
++			keep-power-in-suspend;
++			enable-sdio-wakeup;
++			vmmc-supply = <&wlan_en_reg>;
+ 			status = "okay"; /* conflict with qspi0 */
++			non-removable;
++			cap-power-off-card;
++			#address-cells = <1>;
++			#size-cells = <0>;
++			wlcore: wlcore@0 {
++				compatible = "ti,wl1835";
++				reg = <2>;
++				interrupt-parent = <&pioA>;
++				interrupts = <24 IRQ_TYPE_EDGE_RISING>;
++			};
+ 		};
+ 
+ 		apb {
+@@ -654,6 +676,12 @@
+ 					};
+ 				};
+ 
++				pinctrl_wlan_default: wlan_default {
++						pinmux = <PIN_PA23__GPIO>, /* WLAN_EN */
++							 <PIN_PA24__GPIO>; /* WLAN_IRQ */
++						bias-pull-up;
++				};
++
+ 				pinctrl_sensor_power: sensor_power {
+ 					pinmux = <PIN_PB12__GPIO>;
+ 					bias-disable;
+-- 
+1.7.9.5
+
