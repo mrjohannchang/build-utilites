@@ -178,6 +178,7 @@ function setup_environment()
         DEFAULT_TOOLCHAIN=1
     fi   
 
+
     #if no kernel path is set - download it.
     if [[ "$KERNEL_PATH" == "DEFAULT" ]]
     then            
@@ -195,8 +196,8 @@ function setup_environment()
 	export LIBNL_PATH=`repo_path libnl`	
 	export KLIB=`path filesystem`
 	export KLIB_BUILD=${KERNEL_PATH}
-        export GIT_TREE=`repo_path driver`
-        export PATH=$TOOLCHAIN_PATH:$PATH
+	export GIT_TREE=`repo_path driver`
+	export PATH=$TOOLCHAIN_PATH:$PATH
     
 }
 
@@ -275,7 +276,7 @@ function setup_toolchain()
 
 function build_intree()
 {
-    cd_repo driver
+	cd_repo driver
 	export KERNEL_PATH=`repo_path driver`
 	read_kernel_version
 	[ $CONFIG ] && cp `path configuration`/kernel_$KERNEL_VERSION.$KERNEL_PATCHLEVEL.config `repo_path driver`/.config
@@ -284,6 +285,7 @@ function build_intree()
 
 	make -j${PROCESSORS_NUMBER} zImage
 	make -j${PROCESSORS_NUMBER} am335x-evm.dtb
+	make -j${PROCESSORS_NUMBER} am335x-evm-wow.dtb
 	make -j${PROCESSORS_NUMBER} am335x-bone.dtb
 	make -j${PROCESSORS_NUMBER} am335x-boneblack.dtb
 	make -j${PROCESSORS_NUMBER} am335x-boneblack-e14-wl1837.dtb
@@ -293,6 +295,30 @@ function build_intree()
 	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} modules_install
 	cp `repo_path driver`/arch/arm/boot/zImage `path tftp`/zImage
 	cp `repo_path driver`/arch/arm/boot/dts/am335x-*.dtb `path tftp`/
+
+	assert_no_error
+
+	cd `path filesystem`
+	[ -f ../outputs/drv_skeleton.tar ] && rm ../outputs/drv_skeleton.tar
+	find ./ -name wl*.ko -exec tar rf ../outputs/drv_skeleton.tar {$1} \;
+	find ./ -name *80211*.ko -exec tar rf ../outputs/drv_skeleton.tar {$1} \;
+
+	cd_back
+}
+
+function rebuild_intree()
+{
+    cd_repo driver
+	export KERNEL_PATH=`repo_path driver`
+
+	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} M=net/wireless/ modules
+	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} M=net/wireless/ modules_install
+
+	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} M=net/mac80211/ modules
+	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} M=net/mac80211/ modules_install
+
+	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} M=drivers/net/wireless/ti/ modules
+	INSTALL_MOD_PATH=`path filesystem` make -j${PROCESSORS_NUMBER} M=drivers/net/wireless/ti/ modules_install
 
 	assert_no_error
 	cd_back
@@ -501,6 +527,17 @@ function build_fw_download()
 {
 	cp `repo_path fw_download`/*.bin `path filesystem`/lib/firmware/ti-connectivity
 }
+
+function build_fw()
+{
+	cd `repo_path firmware-build`/victoria/firmware
+	[ -z $NO_CLEAN ] && ./build.sh clean
+	./build.sh
+	cp `repo_path firmware-build`/victoria/firmware/out/Firmware18xx/wl18xx-fw-4.bin `path filesystem`/lib/firmware/ti-connectivity
+	cp `repo_path firmware-build`/victoria/firmware/out/Firmware18xx/wl18xx-fw-4.bin `path outputs`
+	cd_back
+}
+
 
 function patch_kernel()
 {
@@ -911,7 +948,7 @@ function main()
         clean_outputs
         setup_workspace
         read_kernel_version #####read kernel version again after update#####
-        build_all
+        [[ -z $NO_BUILD ]] && build_all
 		;;
         
 		'openlink')
@@ -922,16 +959,20 @@ function main()
         #################### Building single components #############################
 		'kernel')
 		print_highlight " building only Kernel "
-                #clean_kernel
+        #clean_kernel
 		build_uimage
 		;;
 
 		'intree')
 		print_highlight " building modules intree"
-                #clean_kernel
 		build_intree
 		;;
 		
+		'intree_m')
+		print_highlight " Building JUST wireless modules intree"
+		rebuild_intree
+		;;
+
         'kernel_modules')
         print_highlight " building kernel and driver modules"
         build_uimage
@@ -985,9 +1026,22 @@ function main()
 		build_wlconf		
 		;;
 
+		'all_hostap')
+                print_highlight " building hostap and dependencies "
+                build_libnl
+                build_openssl
+                build_wpa_supplicant
+		build_hostapd
+                ;; 
+
 		'firmware')
 		print_highlight " building only firmware"
 		build_fw_download
+		;;
+
+		'fw')
+		print_highlight " building only firmware"
+		build_fw
 		;;
 
 		'patch_kernel')
