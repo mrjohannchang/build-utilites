@@ -49,7 +49,7 @@ processor-sdk-linux-02.00.01
 
 openssl
 git://github.com/openssl/openssl
-OpenSSL_1_0_2g
+OpenSSL_1_0_1g
 
 libnl
 git://github.com/tgraf/libnl.git
@@ -65,7 +65,7 @@ master-2016-02-08
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
-upstream_41
+upstream_44
 
 hostap
 git://git.ti.com/wilink8-wlan/hostap.git
@@ -77,7 +77,7 @@ master
 
 fw_download
 git://git.ti.com/wilink8-wlan/wl18xx_fw.git
-ap_dfs
+master
 
 scripts_download
 git://git.ti.com/wilink8-wlan/wl18xx-target-scripts.git
@@ -85,7 +85,7 @@ sitara-scripts
 
 backports
 git://git.ti.com/wilink8-wlan/backports.git
-upstream_41
+upstream_44
 
 iw
 git://git.kernel.org/pub/scm/linux/kernel/git/jberg/iw.git
