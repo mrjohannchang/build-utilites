@@ -528,17 +528,6 @@ function build_fw_download()
 	cp `repo_path fw_download`/*.bin `path filesystem`/lib/firmware/ti-connectivity
 }
 
-function build_fw()
-{
-	cd `repo_path firmware-build`/victoria/firmware
-	[ -z $NO_CLEAN ] && ./build.sh clean
-	./build.sh
-	cp `repo_path firmware-build`/victoria/firmware/out/Firmware18xx/wl18xx-fw-4.bin `path filesystem`/lib/firmware/ti-connectivity
-	cp `repo_path firmware-build`/victoria/firmware/out/Firmware18xx/wl18xx-fw-4.bin `path outputs`
-	cd_back
-}
-
-
 function patch_kernel()
 {
 	[ ! -d $KERNEL_PATH ] && echo "Error KERNEL_PATH: $KERNEL_PATH dir does not exist" && exit 1
@@ -1037,11 +1026,6 @@ function main()
 		'firmware')
 		print_highlight " building only firmware"
 		build_fw_download
-		;;
-
-		'fw')
-		print_highlight " building only firmware"
-		build_fw
 		;;
 
 		'patch_kernel')
