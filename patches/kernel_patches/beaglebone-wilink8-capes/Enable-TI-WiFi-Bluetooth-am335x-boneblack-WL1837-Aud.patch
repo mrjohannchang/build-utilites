@@ -1,27 +1,20 @@
-From c60c7e3ff205a813dfe071f6a1e8818c02eb6b3c Mon Sep 17 00:00:00 2001
-From: Eyal Reizer <eyalr@ti.com>
-Date: Mon, 2 Nov 2015 12:27:39 +0200
-Subject: [PATCH] ARCH:arm:am335x-boneblack: add su wl1837 audio cape support
+From ed936002e91ef22a395c78205f89586041b615a8 Mon Sep 17 00:00:00 2001
+From: Saurabh Narang <saurabhlocal@ULA0876477>
+Date: Tue, 14 Mar 2017 09:38:41 -0500
+Subject: [PATCH] Enable TI WiFi Bluetooth am335x boneblack WL1837 Audio
 
-* enable mmc2 used for wlan and uart1 used for bluetooth
-* configure the gpios used for wlan and bluetooth controls
-* add fixed voltage regulator used for wlan power control
-* enable i2c1 used for mfi control
-* enable audio support
-
-Signed-off-by: Eyal Reizer <eyalr@ti.com>
 ---
- arch/arm/boot/dts/am335x-bone-su-wl1837.dtsi |  263 ++++++++++++++++++++++++++
+ arch/arm/boot/dts/am335x-bone-su-wl1837.dtsi |  304 ++++++++++++++++++++++++++
  arch/arm/boot/dts/am335x-boneblack.dts       |    3 +
- 2 files changed, 266 insertions(+)
+ 2 files changed, 307 insertions(+)
  create mode 100644 arch/arm/boot/dts/am335x-bone-su-wl1837.dtsi
 
 diff --git a/arch/arm/boot/dts/am335x-bone-su-wl1837.dtsi b/arch/arm/boot/dts/am335x-bone-su-wl1837.dtsi
 new file mode 100644
-index 0000000..40cee07
+index 0000000..7248f1a
 --- /dev/null
 +++ b/arch/arm/boot/dts/am335x-bone-su-wl1837.dtsi
-@@ -0,0 +1,263 @@
+@@ -0,0 +1,304 @@
 +/*
 + * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
 + *
@@ -42,6 +35,14 @@ index 0000000..40cee07
 +		regulator-max-microvolt = <1800000>;
 +		gpio = <&gpio0 26 0>;
 +		enable-active-high;
++	};
++
++	tibt {
++		compatible = "tibt";
++		nshutdown_gpio = <44>; /* Bank1, pin12 */
++		dev_name = "/dev/ttyS4";
++		flow_cntrl = <1>;
++		baud_rate = <3000000>;
 +	};
 +
 +	audio {
@@ -97,6 +98,32 @@ index 0000000..40cee07
 +	pinctrl-names = "default", "sleep";
 +	pinctrl-0 = <&wlan_pins_default>;
 +	pinctrl-1 = <&wlan_pins_sleep>;
++
++
++
++        uart4_pins_default: pinmux_uart4_pins_default {
++                pinctrl-single,pins = <
++                        0xD0 (PIN_INPUT | MUX_MODE6)            /* lcd_data12.uart4_cts */
++                        0xD4 (PIN_OUTPUT_PULLDOWN | MUX_MODE6)  /* lcd_data13.uart4_rts */
++                        0x70 (PIN_INPUT_PULLUP | MUX_MODE6)     /* gpmc_wait0.uart4_rxd */
++                        0x74 (PIN_OUTPUT_PULLDOWN | MUX_MODE6)  /* gpmc_wpn.uart4_txd */
++                >;
++        };
++
++        uart4_pins_sleep: pinmux_uart4_pins_sleep {
++                pinctrl-single,pins = <
++                        0xD0 (PIN_INPUT_PULLDOWN | MUX_MODE7)   /* lcd_data12.uart4_cts */
++                        0xD4 (PIN_INPUT_PULLDOWN | MUX_MODE7)   /* lcd_data13.uart4_rts */
++                        0x70 (PIN_INPUT_PULLDOWN | MUX_MODE7)   /* gpmc_wait0.uart4_rxd */
++                        0x74 (PIN_INPUT_PULLDOWN | MUX_MODE7)   /* gpmc_wpn.uart4_txd */
++                >;
++        };
++
++
++
++
++
++
 +
 +	uart1_pins_default: pinmux_uart1_pins_default {
 +		pinctrl-single,pins = <
@@ -198,6 +225,13 @@ index 0000000..40cee07
 +	status = "okay";
 +};
 +
++&uart4 {
++        pinctrl-names = "default","sleep";
++        pinctrl-0 = <&uart4_pins_default>;
++        pinctrl-1 = <&uart4_pins_sleep>;
++        status = "okay";
++};
++
 +&i2c1 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&i2c1_pins>;
@@ -286,11 +320,11 @@ index 0000000..40cee07
 +	ti,timer-alwon;
 +};
 diff --git a/arch/arm/boot/dts/am335x-boneblack.dts b/arch/arm/boot/dts/am335x-boneblack.dts
-index 369f34d..cf703bb 100644
+index 3d993ae..e2c4256 100644
 --- a/arch/arm/boot/dts/am335x-boneblack.dts
 +++ b/arch/arm/boot/dts/am335x-boneblack.dts
-@@ -147,3 +147,6 @@
- 		clock-names = "mclk";
+@@ -172,3 +172,6 @@
+ 		};
  	};
  };
 +

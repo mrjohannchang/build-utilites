@@ -1,26 +1,20 @@
-From 57cf1aad225bc6961e2e4b49b091ad7d0f0f5a86 Mon Sep 17 00:00:00 2001
-From: Eyal Reizer <eyalr@ti.com>
-Date: Mon, 2 Nov 2015 12:15:53 +0200
-Subject: [PATCH] ARCH:arm:am335x-boneblack: add e14 wl1837 cape support
+From 5e454b707f5c4e89091351bdbbd533331296713c Mon Sep 17 00:00:00 2001
+From: Saurabh Narang <saurabhlocal@ULA0876477>
+Date: Sun, 11 Dec 2016 23:45:47 -0600
+Subject: [PATCH 2/2] Enable TI Bluetooth am335x-boneblack WL1837
 
-* enable mmc2 used for wlan and uart1 used for bluetooth
-* configure the gpios used for wlan and bluetooth controls
-* add fixed voltage regulator used for wlan power control
-* enable i2c1 used for mfi control
-
-Signed-off-by: Eyal Reizer <eyalr@ti.com>
 ---
- arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi |  156 +++++++++++++++++++++++++
- arch/arm/boot/dts/am335x-boneblack.dts        |    3 +
- 2 files changed, 159 insertions(+)
+ arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi |  153 +++++++++++++++++++++++++
+ arch/arm/boot/dts/am335x-boneblack.dts        |    4 +
+ 2 files changed, 157 insertions(+)
  create mode 100644 arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi
 
 diff --git a/arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi b/arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi
 new file mode 100644
-index 0000000..2772216
+index 0000000..315f96f
 --- /dev/null
 +++ b/arch/arm/boot/dts/am335x-bone-e14-wl1837.dtsi
-@@ -0,0 +1,156 @@
+@@ -0,0 +1,153 @@
 +/*
 + * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
 + *
@@ -43,17 +37,14 @@ index 0000000..2772216
 +		enable-active-high;
 +	};
 +
-+	kim {
-+		compatible = "kim";
++	tibt {
++		compatible = "tibt";
 +		nshutdown_gpio = <3>; /* Bank0, pin3 */
-+		dev_name = "/dev/ttyO1";
++		dev_name = "/dev/ttyS1";
 +		flow_cntrl = <1>;
 +		baud_rate = <3000000>;
 +	};
 +
-+	btwilink {
-+		compatible = "btwilink";
-+	};
 +};
 +
 +&am33xx_pinmux {
@@ -178,12 +169,14 @@ index 0000000..2772216
 +	};
 +};
 diff --git a/arch/arm/boot/dts/am335x-boneblack.dts b/arch/arm/boot/dts/am335x-boneblack.dts
-index 369f34d..b40d168 100644
+index 3d993ae..bf755b2c 100644
 --- a/arch/arm/boot/dts/am335x-boneblack.dts
 +++ b/arch/arm/boot/dts/am335x-boneblack.dts
-@@ -147,3 +147,6 @@
- 		clock-names = "mclk";
+@@ -171,4 +171,8 @@
+ 			sound-dai = <&tda19988>;
+ 		};
  	};
++
  };
 +
 +/* Overlay the wilink8 based cape support */
