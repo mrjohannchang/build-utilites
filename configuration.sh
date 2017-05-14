@@ -61,7 +61,7 @@ master
 
 wireless_regdb
 git://git.kernel.org/pub/scm/linux/kernel/git/sforshee/wireless-regdb.git
-master-2016-02-08
+master-2017-03-07
 
 driver
 git://git.ti.com/wilink8-wlan/wl18xx.git
