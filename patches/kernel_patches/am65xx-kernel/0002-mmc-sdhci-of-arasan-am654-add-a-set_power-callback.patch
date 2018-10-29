@@ -1,0 +1,35 @@
+From d959176bcb8c2b7766b577421886fea4f1a0aac9 Mon Sep 17 00:00:00 2001
+From: Eyal Reizer <eyalr@ti.com>
+Date: Mon, 29 Oct 2018 09:45:30 +0200
+Subject: [PATCH 2/3] mmc: sdhci-of-arasan: am654: add a set_power callback
+
+The power register needs to have a valid voltage set even when the power
+supply is managed by an external regulator.
+
+The callback added to sdhci_arasan_ops with upstream commit:
+
+commit 043f2dca367c752bf8a570130f4f0ace4b4be4a8
+
+is valid for am654 as well.
+Add a callback to the same function for am654
+
+Signed-off-by: Eyal Reizer <eyalr@ti.com>
+---
+ drivers/mmc/host/sdhci-of-arasan.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/mmc/host/sdhci-of-arasan.c b/drivers/mmc/host/sdhci-of-arasan.c
+index 17be07a..988b327 100644
+--- a/drivers/mmc/host/sdhci-of-arasan.c
++++ b/drivers/mmc/host/sdhci-of-arasan.c
+@@ -332,6 +332,7 @@ static const struct sdhci_ops sdhci_arasan_am654_ops = {
+ 	.set_bus_width = sdhci_set_bus_width,
+ 	.reset = sdhci_arasan_reset,
+ 	.set_uhs_signaling = sdhci_set_uhs_signaling,
++	.set_power = sdhci_arasan_set_power,
+ };
+ 
+ static const struct sdhci_pltfm_data sdhci_arasan_am654_pdata = {
+-- 
+2.7.4
+
