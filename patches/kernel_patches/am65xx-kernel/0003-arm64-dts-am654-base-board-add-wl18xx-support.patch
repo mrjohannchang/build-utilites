@@ -1,6 +1,6 @@
-From 35777e26beb77c7d0f51ac4af866b52e09a19232 Mon Sep 17 00:00:00 2001
+From 7e3b7b9089690c0cc313c2b917e5b78bf678a2c1 Mon Sep 17 00:00:00 2001
 From: Eyal Reizer <eyalr@ti.com>
-Date: Mon, 29 Oct 2018 09:50:31 +0200
+Date: Mon, 29 Oct 2018 13:44:29 +0200
 Subject: [PATCH 3/3] arm64: dts: am654-base-board: add wl18xx support
 
 the am654 base board doesn't have a com8 connector for conencting
@@ -17,11 +17,11 @@ adapter board (bluetooth subsystem of wl18xx).
 
 Signed-off-by: Eyal Reizer <eyalr@ti.com>
 ---
- arch/arm64/boot/dts/ti/k3-am654-base-board.dts | 81 +++++++++++++++++++++++---
- 1 file changed, 73 insertions(+), 8 deletions(-)
+ arch/arm64/boot/dts/ti/k3-am654-base-board.dts | 80 +++++++++++++++++++++++---
+ 1 file changed, 72 insertions(+), 8 deletions(-)
 
 diff --git a/arch/arm64/boot/dts/ti/k3-am654-base-board.dts b/arch/arm64/boot/dts/ti/k3-am654-base-board.dts
-index c1d4d39..81095d0 100644
+index c1d4d39..6443adb 100644
 --- a/arch/arm64/boot/dts/ti/k3-am654-base-board.dts
 +++ b/arch/arm64/boot/dts/ti/k3-am654-base-board.dts
 @@ -126,6 +126,20 @@
@@ -113,7 +113,7 @@ index c1d4d39..81095d0 100644
  	};
  };
  
-@@ -443,7 +483,21 @@
+@@ -443,7 +483,20 @@
  &sdhci1 {
  	status = "okay";
  	pinctrl-names = "default";
@@ -123,7 +123,6 @@ index c1d4d39..81095d0 100644
 +	non-removable;
 +	cap-power-off-card;
 +	keep-power-in-suspend;
-+	max-frequency = <20000000>;
 +
 +	#address-cells = <1>;
 +	#size-cells = <0>;
@@ -136,7 +135,7 @@ index c1d4d39..81095d0 100644
  };
  
  &mmc_phy1 {
-@@ -490,3 +544,14 @@
+@@ -490,3 +543,14 @@
  		ti,adc-channels = <0 1 2 3 4 5 6 7>;
  	};
  };
